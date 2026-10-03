@@ -1,0 +1,1411 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f2ec">
+  <title>Playroom - Find your next game</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f4f2ec;
+      --surface: #fffefa;
+      --ink: #202522;
+      --muted: #818780;
+      --line: #e8e7df;
+      --green: #245b46;
+      --green-dark: #183f32;
+      --lime: #dcf36b;
+      --coral: #f27c5b;
+      --lavender: #d9d4ff;
+      --blue: #d9e9f4;
+      --shadow: 0 14px 40px rgb(32 37 34 / 8%);
+      font-family: "DM Sans", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-width: 320px; background: var(--paper); color: var(--ink); }
+    button, input { font: inherit; }
+    button { color: inherit; }
+    button:focus-visible, input:focus-visible { outline: 3px solid #ec9d78; outline-offset: 3px; }
+    .shell { min-height: 100vh; display: grid; grid-template-columns: 230px minmax(0, 1fr); }
+    .sidebar { padding: 27px 18px 20px 24px; border-right: 1px solid var(--line); background: #f8f7f2; display: flex; flex-direction: column; gap: 32px; }
+    .brand { display: flex; align-items: center; gap: 10px; color: var(--ink); font: 700 21px "Space Grotesk", sans-serif; letter-spacing: 0; text-decoration: none; }
+    .brand-mark { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 10px; background: var(--green); color: var(--lime); font-size: 19px; transform: rotate(-5deg); }
+    .side-label { margin: 0 0 8px 11px; color: #9a9e98; font-size: 10px; font-weight: 700; letter-spacing: 0; text-transform: uppercase; }
+    .nav-list { display: grid; gap: 4px; }
+    .nav-item { width: 100%; border: 0; border-radius: 11px; padding: 11px 12px; background: transparent; display: flex; align-items: center; gap: 12px; text-align: left; color: #69716b; cursor: pointer; font-size: 13px; font-weight: 600; transition: background .18s, color .18s, transform .18s; }
+    .nav-item:hover { background: #efeee7; color: var(--ink); transform: translateX(2px); }
+    .nav-item.active { background: #e7ede5; color: var(--green); }
+    .nav-icon { width: 20px; text-align: center; font-size: 17px; }
+    .nav-count { margin-left: auto; min-width: 20px; border-radius: 8px; padding: 2px 6px; background: #f5c9b9; color: #813d29; text-align: center; font-size: 10px; }
+    .sidebar-spacer { flex: 1; }
+    .invite-card { position: relative; overflow: hidden; border-radius: 15px; padding: 15px 13px; background: var(--green); color: white; }
+    .invite-card::after { content: "✳"; position: absolute; right: -4px; bottom: -18px; color: var(--lime); font-size: 73px; opacity: .85; transform: rotate(-14deg); }
+    .invite-card b { display: block; max-width: 135px; font: 600 15px "Space Grotesk", sans-serif; }
+    .invite-card p { max-width: 142px; margin: 7px 0 12px; color: #d5e3d8; font-size: 11px; line-height: 1.5; }
+    .invite-card button { position: relative; z-index: 1; border: 0; border-radius: 8px; padding: 8px 10px; background: var(--lime); color: var(--green-dark); cursor: pointer; font-size: 11px; font-weight: 700; }
+    .profile-mini { display: flex; align-items: center; gap: 10px; padding: 12px 2px 0; border-top: 1px solid var(--line); }
+    .avatar { width: 35px; height: 35px; display: grid; flex: 0 0 auto; place-items: center; border-radius: 50%; background: #f4c4ac; font-size: 19px; }
+    .profile-mini strong { display: block; font-size: 12px; }
+    .profile-mini small { color: var(--muted); font-size: 10px; }
+    main { min-width: 0; padding: 0 40px 40px; }
+    .topbar { height: 76px; display: flex; align-items: center; justify-content: space-between; gap: 20px; border-bottom: 1px solid var(--line); }
+    .breadcrumbs { color: var(--muted); font-size: 12px; }
+    .header-start { display: flex; align-items: center; gap: 11px; }
+    .back-button { min-height: 34px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 9px; padding: 0 10px; background: var(--surface); color: var(--green); cursor: pointer; font-size: 11px; font-weight: 700; }
+    .back-button[hidden] { display: none; }
+    .top-actions { display: flex; align-items: center; gap: 12px; }
+    .search-box { width: min(280px, 34vw); height: 38px; display: flex; align-items: center; gap: 8px; padding: 0 11px; border: 1px solid #e5e4dc; border-radius: 10px; background: #faf9f5; color: #92968f; }
+    .search-box input { width: 100%; border: 0; outline: 0; background: transparent; color: var(--ink); font-size: 12px; }
+    .search-box input::placeholder { color: #a5a8a2; }
+    .coin-pill { display: flex; align-items: center; gap: 6px; border: 1px solid #e8e6d9; border-radius: 9px; padding: 8px 10px; background: #fffefa; font-size: 11px; font-weight: 700; white-space: nowrap; }
+    .icon-button { width: 37px; height: 37px; border: 1px solid #e8e6d9; border-radius: 10px; background: #fffefa; cursor: pointer; }
+    .profile-wrap { position: relative; }
+    .profile-button { display: flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 10px; padding: 4px 9px 4px 5px; background: var(--surface); cursor: pointer; text-align: left; }
+    .profile-button .avatar { width: 31px; height: 31px; font-size: 17px; }
+    .profile-label b, .profile-label small { display: block; white-space: nowrap; }
+    .profile-label b { font-size: 10px; }
+    .profile-label small { margin-top: 2px; color: var(--muted); font-size: 9px; }
+    .profile-menu { width: 170px; position: absolute; z-index: 8; top: calc(100% + 8px); right: 0; border: 1px solid var(--line); border-radius: 10px; padding: 5px; background: var(--surface); box-shadow: var(--shadow); }
+    .profile-menu button { width: 100%; border: 0; border-radius: 7px; padding: 9px; background: transparent; cursor: pointer; text-align: left; font-size: 11px; }
+    .profile-menu button:hover { background: #f3f4ef; }
+    .catalog-view[hidden], .birthday-banner[hidden] { display: none; }
+    .catalog-view { max-width: 1050px; margin: 0 auto; padding: 23px 0; }
+    .catalog-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 15px; margin-bottom: 18px; }
+    .catalog-heading h1 { margin: 0 0 5px; font-size: 26px; }
+    .catalog-heading p { margin: 0; color: var(--muted); font-size: 12px; }
+    .catalog-group { margin: 20px 0 25px; }
+    .catalog-group h2 { margin: 0 0 11px; font: 700 16px "Space Grotesk", sans-serif; }
+    .catalog-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 11px; }
+    .catalog-game { min-width: 0; min-height: 102px; display: flex; align-items: center; gap: 11px; border: 1px solid var(--line); border-radius: 12px; padding: 12px; background: var(--surface); cursor: pointer; text-align: left; transition: transform .15s, box-shadow .15s; }
+    .catalog-game:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgb(32 37 34 / 8%); }
+    .catalog-logo { width: 46px; height: 46px; display: grid; flex: 0 0 auto; place-items: center; border-radius: 12px; background: #e8efdc; font-size: 24px; }
+    .catalog-game:nth-child(4n + 2) .catalog-logo { background: #f7e4d6; }
+    .catalog-game:nth-child(4n + 3) .catalog-logo { background: #e2e2f7; }
+    .catalog-game:nth-child(4n) .catalog-logo { background: #dcedf1; }
+    .catalog-game-copy { min-width: 0; flex: 1; }
+    .catalog-game-copy b { display: block; overflow: hidden; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+    .catalog-game-copy small { display: block; margin-top: 4px; color: var(--muted); font-size: 9px; }
+    .catalog-status { align-self: flex-start; border-radius: 5px; padding: 4px 5px; background: #e7ede5; color: var(--green); font-size: 8px; font-weight: 700; white-space: nowrap; }
+    .catalog-status.preview { background: #f2eee1; color: #806b37; }
+    .birthday-banner { margin: 0 0 14px; border-radius: 12px; padding: 14px 17px; background: linear-gradient(110deg, #f8e2bb, #f3d6d2 52%, #e9dff5); }
+    .birthday-banner h2 { margin: 0 0 4px; font: 700 16px "Space Grotesk", sans-serif; }
+    .birthday-banner p { margin: 0; color: #5f514b; font-size: 11px; }
+    .launch-backdrop, .setup-backdrop { position: fixed; z-index: 15; inset: 0; display: none; place-items: center; overflow-y: auto; padding: 18px; background: rgb(19 30 24 / 58%); backdrop-filter: blur(5px); }
+    .launch-backdrop.open, .setup-backdrop.open { display: grid; }
+    .launch-panel, .setup-panel { width: min(480px, 100%); border-radius: 16px; padding: 22px; background: var(--surface); box-shadow: 0 26px 90px rgb(0 0 0 / 30%); }
+    .launch-title { display: flex; align-items: center; gap: 11px; margin-bottom: 12px; }
+    .launch-title .catalog-logo { width: 52px; height: 52px; }
+    .launch-title h2 { margin: 0 0 3px; font: 700 20px "Space Grotesk", sans-serif; }
+    .launch-title p, .launch-note { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
+    .launch-modes { display: grid; gap: 8px; margin-top: 18px; }
+    .launch-mode { display: flex; align-items: center; justify-content: space-between; gap: 10px; border: 1px solid var(--line); border-radius: 10px; padding: 12px; background: white; cursor: pointer; text-align: left; }
+    .launch-mode:hover { border-color: var(--green); }
+    .launch-mode:disabled { opacity: .55; cursor: not-allowed; }
+    .launch-mode b { display: block; font-size: 11px; }
+    .launch-mode small { display: block; margin-top: 3px; color: var(--muted); font-size: 9px; }
+    .launch-foot { display: flex; justify-content: flex-end; margin-top: 14px; }
+    .setup-backdrop { z-index: 30; }
+    .setup-panel { width: min(470px, 100%); }
+    .setup-panel h1 { margin: 0 0 5px; font-size: 23px; }
+    .setup-panel > p { margin: 0 0 17px; color: var(--muted); font-size: 11px; line-height: 1.6; }
+    .setup-fields { display: grid; gap: 12px; }
+    .setup-fields label { display: grid; gap: 5px; color: #59615b; font-size: 10px; font-weight: 700; }
+    .setup-fields input, .setup-fields select { width: 100%; min-height: 39px; border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; background: #fff; color: var(--ink); font-size: 12px; }
+    .setup-check { display: flex; align-items: flex-start; gap: 8px; color: #68716a; font-size: 10px; line-height: 1.5; }
+    .setup-check input { margin: 2px 0 0; }
+    .setup-error { min-height: 15px; margin: 0; color: #a23d3d; font-size: 10px; }
+    .birthday-note { border-radius: 8px; padding: 9px; background: #f6f3e9; color: #756847; font-size: 9px; line-height: 1.5; }
+    .match-safety { border-radius: 9px; padding: 10px; background: #f4f5ef; color: #59615b; font-size: 10px; line-height: 1.55; }
+    .friends-view { max-width: 1050px; margin: 0 auto; padding: 24px 0; }
+    .friends-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; margin-bottom: 18px; }
+    .friends-heading h1 { margin: 0 0 5px; font-size: 25px; }
+    .friends-heading p { margin: 0; color: var(--muted); font-size: 11px; }
+    .friends-tabs { display: flex; gap: 6px; margin-bottom: 14px; border-bottom: 1px solid var(--line); }
+    .friends-tab { border: 0; border-bottom: 2px solid transparent; padding: 9px 12px; background: transparent; color: var(--muted); cursor: pointer; font-size: 11px; font-weight: 700; }
+    .friends-tab.selected { border-bottom-color: var(--green); color: var(--green); }
+    .friends-empty { border: 1px dashed #d9ddd5; border-radius: 12px; padding: 26px 18px; background: #fafaf6; color: #677068; text-align: center; font-size: 11px; line-height: 1.6; }
+    .friends-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .friend-card { display: grid; justify-items: center; gap: 7px; border: 1px solid var(--line); border-radius: 12px; padding: 17px 12px 13px; background: var(--surface); cursor: pointer; text-align: center; transition: transform .16s, box-shadow .16s; }
+    .friend-card:hover { transform: translateY(-2px); box-shadow: 0 9px 22px rgb(32 37 34 / 8%); }
+    .friend-card-avatar { width: 58px; height: 58px; position: relative; display: grid; place-items: center; border-radius: 50%; background: var(--lavender); font-size: 27px; }
+    .friend-card-avatar.orange { background: #ffe1c7; }
+    .friend-card-avatar.blue { background: var(--blue); }
+    .friend-card b { font-size: 12px; }
+    .friend-card small { color: var(--muted); font-size: 9px; }
+    .chat-layout { min-height: min(610px, calc(100vh - 165px)); display: grid; grid-template-columns: 250px minmax(0, 1fr); overflow: hidden; border: 1px solid var(--line); border-radius: 13px; background: var(--surface); }
+    .chat-list { min-width: 0; border-right: 1px solid var(--line); }
+    .chat-list-head { display: flex; align-items: center; justify-content: space-between; padding: 14px; border-bottom: 1px solid var(--line); font: 700 15px "Space Grotesk", sans-serif; }
+    .chat-list-body { display: grid; gap: 2px; padding: 6px; }
+    .chat-person { display: flex; align-items: center; gap: 9px; border: 0; border-radius: 9px; padding: 9px; background: transparent; cursor: pointer; text-align: left; }
+    .chat-person.selected, .chat-person:hover { background: #f1f3ed; }
+    .chat-person-avatar { width: 36px; height: 36px; position: relative; display: grid; flex: 0 0 auto; place-items: center; border-radius: 50%; background: var(--lavender); font-size: 18px; }
+    .chat-person-copy { min-width: 0; }
+    .chat-person-copy b, .chat-person-copy small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .chat-person-copy b { font-size: 10px; }
+    .chat-person-copy small { margin-top: 3px; color: var(--muted); font-size: 9px; }
+    .chat-thread { min-width: 0; display: grid; grid-template-rows: auto minmax(0, 1fr) auto auto; }
+    .chat-thread-head { display: flex; align-items: center; gap: 9px; padding: 12px 15px; border-bottom: 1px solid var(--line); }
+    .chat-thread-head b { display: block; font-size: 11px; }
+    .chat-thread-head small { display: block; margin-top: 3px; color: var(--muted); font-size: 9px; }
+    .chat-messages { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; overflow-y: auto; padding: 16px; }
+    .chat-bubble { max-width: min(78%, 390px); border-radius: 13px 13px 13px 4px; padding: 9px 11px; background: #f0f2ec; font-size: 11px; line-height: 1.5; overflow-wrap: anywhere; }
+    .chat-bubble.mine { align-self: flex-end; border-radius: 13px 13px 4px 13px; background: var(--green); color: white; }
+    .chat-time { margin-top: 3px; color: #859088; font-size: 8px; }
+    .chat-bubble.mine .chat-time { color: #d0ded2; }
+    .chat-demo-note { padding: 6px 12px; color: #8b918b; text-align: center; font-size: 8px; }
+    .chat-compose { display: flex; gap: 8px; padding: 10px; border-top: 1px solid var(--line); }
+    .chat-compose input { min-width: 0; flex: 1; border: 1px solid var(--line); border-radius: 18px; padding: 9px 12px; background: #fafaf7; font-size: 11px; }
+    .profile-dialog { width: min(370px, 100%); position: relative; border-radius: 16px; padding: 25px; background: var(--surface); text-align: center; box-shadow: 0 26px 90px rgb(0 0 0 / 30%); }
+    .profile-dialog .close-button { position: absolute; top: 12px; right: 12px; }
+    .profile-dialog-avatar { width: 78px; height: 78px; display: grid; place-items: center; margin: 4px auto 10px; border-radius: 50%; background: var(--lavender); font-size: 37px; }
+    .profile-dialog h2 { margin: 0 0 4px; font: 700 19px "Space Grotesk", sans-serif; }
+    .profile-dialog p { margin: 0 0 17px; color: var(--muted); font-size: 10px; }
+    .profile-dialog .button { width: 100%; }
+    @media (max-width: 780px) { .catalog-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .friends-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .chat-layout { grid-template-columns: 190px minmax(0, 1fr); } }
+    @media (max-width: 520px) { .catalog-heading { align-items: flex-start; flex-direction: column; } .catalog-grid { gap: 8px; } .catalog-game { min-height: 89px; gap: 8px; padding: 9px; } .catalog-logo { width: 39px; height: 39px; font-size: 21px; } .catalog-status { font-size: 7px; } .friends-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; } .chat-layout { min-height: calc(100vh - 155px); grid-template-columns: 1fr; } .chat-list { display: none; } .chat-thread { min-height: calc(100vh - 155px); } .friends-heading { align-items: flex-start; flex-direction: column; } }
+    .content { max-width: 1300px; margin: 0 auto; }
+    .welcome { display: flex; align-items: flex-end; justify-content: space-between; gap: 22px; padding: 27px 0 22px; animation: rise .45s ease both; }
+    .eyebrow { display: flex; align-items: center; gap: 7px; margin: 0 0 7px; color: var(--green); font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { margin-bottom: 5px; font: 700 29px "Space Grotesk", sans-serif; letter-spacing: 0; }
+    .welcome-copy { margin: 0; color: var(--muted); font-size: 12px; }
+    .welcome-actions { display: flex; align-items: center; gap: 8px; }
+    .button { min-height: 39px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; border: 0; border-radius: 10px; padding: 0 14px; cursor: pointer; font-size: 11px; font-weight: 700; transition: transform .18s, filter .18s; }
+    .button:hover { transform: translateY(-2px); filter: brightness(.98); }
+    .button-primary { background: var(--green); color: white; }
+    .button-secondary { border: 1px solid var(--line); background: var(--surface); }
+    .hero { min-height: 228px; position: relative; overflow: hidden; display: grid; grid-template-columns: 1.05fr .95fr; border-radius: 17px; background: var(--green-dark); color: #fff; box-shadow: var(--shadow); animation: rise .52s .04s ease both; }
+    .hero-copy { position: relative; z-index: 2; align-self: center; padding: 27px 31px; }
+    .hero-kicker { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 12px; color: var(--lime); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
+    .hero h2 { max-width: 380px; margin-bottom: 8px; font: 700 27px/1.1 "Space Grotesk", sans-serif; letter-spacing: 0; }
+    .hero p { max-width: 340px; margin-bottom: 17px; color: #d2ded5; font-size: 12px; line-height: 1.6; }
+    .hero .button { background: var(--lime); color: #203f30; }
+    .hero-art { min-height: 228px; position: relative; background: linear-gradient(90deg, var(--green-dark) 0%, rgb(24 63 50 / 5%) 35%), url("https://images.unsplash.com/photo-1606503153255-59d8b8b821f2?auto=format&fit=crop&w=1100&q=85") center 47% / cover; }
+    .hero-art::before { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, #183f32 0%, transparent 45%), linear-gradient(0deg, rgb(17 38 30 / 20%), transparent); }
+    .float-tag { position: absolute; right: 25px; bottom: 18px; display: flex; align-items: center; gap: 8px; border: 1px solid rgb(255 255 255 / 30%); border-radius: 11px; padding: 9px 12px; background: rgb(255 255 255 / 90%); color: var(--ink); box-shadow: 0 8px 25px rgb(0 0 0 / 14%); font-size: 10px; font-weight: 700; backdrop-filter: blur(8px); }
+    .float-tag span { font-size: 16px; }
+    .dashboard-grid { display: grid; grid-template-columns: minmax(0, 1fr) 272px; gap: 24px; padding-top: 24px; }
+    .section-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 13px; }
+    .section-head h2 { margin: 0; font: 700 17px "Space Grotesk", sans-serif; letter-spacing: 0; }
+    .section-head a, .text-button { border: 0; background: transparent; color: var(--green); cursor: pointer; font-size: 11px; font-weight: 700; text-decoration: none; }
+    .section-sub { margin: -8px 0 13px; color: var(--muted); font-size: 11px; }
+    .game-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .game-card { min-width: 0; border: 1px solid var(--line); border-radius: 13px; overflow: hidden; background: var(--surface); cursor: pointer; transition: transform .2s, box-shadow .2s; }
+    .game-card:hover { transform: translateY(-3px); box-shadow: 0 9px 22px rgb(32 37 34 / 9%); }
+    .game-thumb { height: 108px; position: relative; overflow: hidden; background: var(--blue); }
+    .game-thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform .35s; }
+    .game-card:hover .game-thumb img { transform: scale(1.04); }
+    .game-tag { position: absolute; left: 8px; top: 8px; border-radius: 6px; padding: 4px 7px; background: rgb(255 254 250 / 90%); color: #4b554d; font-size: 9px; font-weight: 700; }
+    .players-tag { position: absolute; right: 8px; bottom: 8px; border-radius: 6px; padding: 4px 6px; background: rgb(24 38 30 / 76%); color: white; font-size: 9px; }
+    .game-info { padding: 10px 11px 11px; }
+    .game-info h3 { overflow: hidden; margin: 0 0 3px; font: 700 13px "Space Grotesk", sans-serif; letter-spacing: 0; text-overflow: ellipsis; white-space: nowrap; }
+    .game-info p { margin: 0; color: var(--muted); font-size: 10px; }
+    .filters { display: flex; gap: 6px; margin: 0 0 14px; overflow-x: auto; scrollbar-width: none; }
+    .filter-chip { flex: 0 0 auto; border: 1px solid #e5e4dc; border-radius: 8px; padding: 7px 10px; background: transparent; color: #737b74; cursor: pointer; font-size: 10px; font-weight: 600; }
+    .filter-chip.selected { border-color: var(--green); background: var(--green); color: white; }
+    .right-column { display: grid; align-content: start; gap: 21px; }
+    .side-panel { border: 1px solid var(--line); border-radius: 13px; padding: 14px; background: var(--surface); }
+    .side-panel .section-head { margin-bottom: 12px; }
+    .side-panel .section-head h2 { font-size: 15px; }
+    .friend-row { display: flex; align-items: center; gap: 9px; padding: 8px 0; }
+    .friend-row + .friend-row { border-top: 1px solid #f0efe9; }
+    .friend-avatar { width: 34px; height: 34px; position: relative; display: grid; flex: 0 0 auto; place-items: center; border-radius: 11px; background: var(--lavender); font-size: 18px; }
+    .friend-avatar.orange { background: #ffe1c7; }
+    .friend-avatar.blue { background: var(--blue); }
+    .online-dot { width: 9px; height: 9px; position: absolute; right: -2px; bottom: -1px; border: 2px solid white; border-radius: 50%; background: #58b779; }
+    .friend-name { min-width: 0; flex: 1; }
+    .friend-name b { display: block; overflow: hidden; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+    .friend-name small { color: var(--muted); font-size: 9px; }
+    .invite-button { width: 28px; height: 28px; flex: 0 0 auto; border: 1px solid var(--line); border-radius: 8px; background: white; color: var(--green); cursor: pointer; }
+    .reward-panel { position: relative; overflow: hidden; border: 0; background: #f4edce; }
+    .reward-panel::after { content: "✦"; position: absolute; right: 6px; top: -14px; color: #e9bb53; font-size: 73px; opacity: .5; }
+    .reward-panel .section-head { position: relative; z-index: 1; }
+    .reward-panel p { position: relative; z-index: 1; max-width: 190px; margin: 0 0 12px; color: #716647; font-size: 10px; line-height: 1.5; }
+    .reward-panel .button { position: relative; z-index: 1; min-height: 33px; background: #e3b646; color: #3f351e; }
+    .reward-done { opacity: .65; cursor: default; }
+    .tournament-panel { position: relative; overflow: hidden; background: #f1eaff; }
+    .tournament-panel .date-mark { width: 42px; height: 44px; display: grid; place-content: center; border-radius: 9px; background: white; color: #6651ab; text-align: center; font-size: 9px; font-weight: 700; line-height: 1.1; }
+    .tournament-panel .date-mark b { font: 700 17px "Space Grotesk", sans-serif; }
+    .tourney-row { display: flex; align-items: center; gap: 10px; }
+    .tourney-copy { flex: 1; }
+    .tourney-copy b { display: block; font-size: 11px; }
+    .tourney-copy small { color: #7c748f; font-size: 9px; }
+    .tourney-row .invite-button { background: #fff; color: #6651ab; }
+    .bottom-note { margin-top: 21px; color: #9a9e98; text-align: center; font-size: 9px; }
+    .welcome { align-items: center; padding: 21px 0 16px; }
+    .welcome h1 { font-size: 25px; }
+    .feed-layout { display: grid; grid-template-columns: minmax(0, 650px) 280px; justify-content: center; align-items: start; gap: 25px; }
+    .feed-column { display: grid; gap: 13px; min-width: 0; }
+    .stories { display: flex; gap: 17px; overflow-x: auto; padding: 14px 16px; border: 1px solid var(--line); border-radius: 13px; background: var(--surface); scrollbar-width: none; }
+    .stories::-webkit-scrollbar { display: none; }
+    .story { width: 55px; flex: 0 0 auto; display: grid; justify-items: center; gap: 6px; border: 0; padding: 0; background: none; cursor: pointer; }
+    .story-avatar { width: 51px; height: 51px; position: relative; display: grid; place-items: center; border: 2px solid white; border-radius: 50%; background: #e7dfff; box-shadow: 0 0 0 2px #ea875e; font-size: 24px; }
+    .story:first-child .story-avatar { background: #e7eee3; box-shadow: 0 0 0 2px #d8ddd6; font-size: 22px; }
+    .story-name { max-width: 60px; overflow: hidden; color: #59615b; font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
+    .post-composer { display: grid; grid-template-columns: 38px minmax(0, 1fr); gap: 11px; padding: 14px; border: 1px solid var(--line); border-radius: 13px; background: var(--surface); }
+    .composer-avatar { width: 38px; height: 38px; }
+    .composer-main { min-width: 0; }
+    .composer-main input { width: 100%; height: 38px; border: 0; border-radius: 20px; padding: 0 14px; background: #f3f4f0; color: var(--ink); font-size: 12px; }
+    .composer-tools { display: flex; justify-content: space-between; gap: 8px; margin-top: 10px; padding-top: 9px; border-top: 1px solid #f0efe9; }
+    .composer-tool { border: 0; padding: 5px 7px; background: transparent; color: #68716a; cursor: pointer; font-size: 10px; font-weight: 600; white-space: nowrap; }
+    .composer-tool span { margin-right: 4px; font-size: 13px; }
+    .post-card { overflow: hidden; border: 1px solid var(--line); border-radius: 13px; background: var(--surface); }
+    .post-head { display: flex; align-items: center; gap: 9px; padding: 13px 14px 9px; }
+    .post-avatar { width: 36px; height: 36px; background: #f4d0bb; font-size: 18px; }
+    .post-author { min-width: 0; flex: 1; }
+    .post-author b { display: block; font-size: 11px; }
+    .post-author small { color: var(--muted); font-size: 9px; }
+    .post-menu { border: 0; background: transparent; color: #747c75; cursor: pointer; font-size: 18px; }
+    .post-copy { margin: 0; padding: 0 14px 11px; color: #353c37; font-size: 12px; line-height: 1.6; }
+    .post-copy strong { color: var(--green); }
+    .post-media { width: 100%; max-height: 370px; display: block; object-fit: cover; background: #d9e9f4; }
+    .post-meta { display: flex; justify-content: space-between; gap: 10px; padding: 10px 14px 8px; color: #7a817b; font-size: 10px; }
+    .post-actions { display: grid; grid-template-columns: repeat(3, 1fr); margin: 0 13px; padding: 5px 0; border-top: 1px solid #efeee9; }
+    .post-action { min-height: 34px; border: 0; border-radius: 7px; background: transparent; color: #69716b; cursor: pointer; font-size: 10px; font-weight: 700; }
+    .post-action:hover { background: #f5f5ef; }
+    .post-action.liked { color: #d84e59; }
+    .post-comments { display: none; padding: 0 14px 12px; }
+    .post-comments.open { display: flex; gap: 7px; }
+    .post-comments input { min-width: 0; flex: 1; border: 1px solid var(--line); border-radius: 16px; padding: 7px 11px; font-size: 10px; }
+    .post-comments button { border: 0; background: transparent; color: var(--green); cursor: pointer; font-size: 10px; font-weight: 700; }
+    .post-game { margin: 0 14px 12px; border: 1px solid var(--line); border-radius: 10px; padding: 10px; background: #f7f7f1; display: flex; align-items: center; gap: 10px; }
+    .post-game-icon { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 9px; background: var(--lime); font-size: 21px; }
+    .post-game-copy { min-width: 0; flex: 1; }
+    .post-game-copy b { display: block; font-size: 10px; }
+    .post-game-copy small { color: var(--muted); font-size: 9px; }
+    .post-game .button { min-height: 31px; padding: 0 10px; font-size: 9px; }
+    .feed-side { display: grid; gap: 13px; }
+    .feed-side .side-panel { border-radius: 13px; }
+    .games-panel { display: grid; gap: 8px; }
+    .mini-game { display: flex; align-items: center; gap: 9px; border: 0; border-radius: 9px; padding: 7px; background: transparent; text-align: left; cursor: pointer; }
+    .mini-game:hover { background: #f4f5ef; }
+    .mini-game-thumb { width: 38px; height: 38px; display: grid; flex: 0 0 auto; place-items: center; border-radius: 9px; background: #f5d4bd; font-size: 20px; }
+    .mini-game:nth-child(2) .mini-game-thumb { background: #d8e9f2; }
+    .mini-game:nth-child(3) .mini-game-thumb { background: #e6e0ff; }
+    .mini-game b { display: block; font-size: 10px; }
+    .mini-game small { color: var(--muted); font-size: 9px; }
+    .game-mode-label { margin-left: auto; border-radius: 5px; padding: 4px 5px; background: #e7ede5; color: var(--green); font-size: 8px; font-weight: 700; }
+    .story-modal { width: min(420px, 100%); min-height: 460px; position: relative; overflow: hidden; display: grid; align-content: end; border-radius: 17px; padding: 25px; background: linear-gradient(0deg, rgb(15 27 21 / 82%), transparent 55%), url("https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=900&q=80") center / cover; color: white; box-shadow: 0 26px 90px rgb(0 0 0 / 30%); }
+    .story-modal .story-close { position: absolute; top: 13px; right: 13px; color: white; background: rgb(0 0 0 / 25%); border-color: rgb(255 255 255 / 45%); }
+    .story-modal h2 { margin: 0 0 4px; font: 700 22px "Space Grotesk", sans-serif; }
+    .story-modal p { margin: 0; color: #f0f0e9; font-size: 12px; }
+    .story-progress { position: absolute; top: 12px; right: 57px; left: 14px; height: 3px; border-radius: 3px; background: rgb(255 255 255 / 45%); }
+    .story-progress::before { content: ""; width: 45%; height: 100%; display: block; border-radius: inherit; background: white; }
+    .modal-backdrop.story-open { z-index: 12; }
+    [hidden] { display: none !important; }
+    .feed-side { position: sticky; top: 14px; }
+    .modal-backdrop { position: fixed; z-index: 10; inset: 0; display: none; place-items: center; padding: 18px; background: rgb(19 30 24 / 58%); backdrop-filter: blur(5px); }
+    .modal-backdrop.open { display: grid; animation: fade .18s ease both; }
+    .game-modal { width: min(440px, 100%); position: relative; border: 1px solid rgb(255 255 255 / 50%); border-radius: 18px; padding: 23px; background: var(--surface); box-shadow: 0 26px 90px rgb(0 0 0 / 30%); animation: pop .2s ease both; }
+    .modal-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+    .modal-top h2 { margin: 0 0 4px; font: 700 22px "Space Grotesk", sans-serif; letter-spacing: 0; }
+    .modal-top p { margin: 0; color: var(--muted); font-size: 11px; }
+    .close-button { width: 34px; height: 34px; border: 1px solid var(--line); border-radius: 9px; background: white; cursor: pointer; font-size: 18px; }
+    .game-mode { display: flex; gap: 5px; margin: 19px 0 14px; padding: 4px; border-radius: 10px; background: #f1f0e9; }
+    .mode-button { min-height: 31px; flex: 1; border: 0; border-radius: 7px; background: transparent; color: #727972; cursor: pointer; font-size: 10px; font-weight: 700; }
+    .mode-button.selected { background: white; color: var(--green); box-shadow: 0 2px 6px rgb(20 30 20 / 8%); }
+    .match-status { min-height: 20px; margin: 0 0 10px; color: #647169; text-align: center; font-size: 11px; font-weight: 600; }
+    .board { width: min(270px, 82vw); display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 0 auto 17px; }
+    .cell { aspect-ratio: 1; border: 1px solid #e8e8df; border-radius: 13px; background: #f7f7f1; cursor: pointer; font: 700 45px "Space Grotesk", sans-serif; transition: background .15s, transform .15s; }
+    .cell:hover:enabled { background: #eff3e7; transform: scale(1.025); }
+    .cell.x-mark { color: var(--green); }
+    .cell.o-mark { color: var(--coral); }
+    .modal-actions { display: flex; justify-content: center; gap: 8px; }
+    .modal-actions .button { min-width: 120px; }
+    .toast { position: fixed; z-index: 20; right: 21px; bottom: 21px; max-width: min(340px, calc(100vw - 42px)); border-radius: 11px; padding: 12px 15px; background: #202b24; color: white; box-shadow: var(--shadow); font-size: 12px; opacity: 0; pointer-events: none; transform: translateY(10px); transition: opacity .2s, transform .2s; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    @keyframes rise { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes pop { from { opacity: 0; transform: scale(.98) translateY(8px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
+    @media (max-width: 1050px) {
+      .shell { grid-template-columns: 200px minmax(0, 1fr); }
+      .sidebar { padding-left: 17px; }
+      main { padding-right: 25px; padding-left: 25px; }
+      .dashboard-grid { grid-template-columns: minmax(0, 1fr) 245px; gap: 17px; }
+      .game-grid { gap: 9px; }
+      .game-thumb { height: 92px; }
+    }
+    @media (max-width: 1150px) {
+      .feed-layout { grid-template-columns: minmax(0, 650px); }
+      .feed-side { position: static; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .feed-side > .side-panel:first-child { grid-row: span 2; }
+    }
+    @media (max-width: 780px) {
+      .shell { display: block; padding-bottom: 68px; }
+      .sidebar { width: 100%; height: 58px; position: fixed; z-index: 5; inset: auto 0 0; flex-direction: row; align-items: center; justify-content: space-around; gap: 0; padding: 5px 8px max(5px, env(safe-area-inset-bottom)); border-top: 1px solid var(--line); border-right: 0; background: rgb(248 247 242 / 96%); backdrop-filter: blur(14px); }
+      .brand, .side-label, .invite-card, .profile-mini, .sidebar-spacer { display: none; }
+      .sidebar nav { width: 100%; }
+      .nav-list { grid-template-columns: repeat(4, 1fr); gap: 3px; }
+      .nav-item { justify-content: center; gap: 0; padding: 8px 4px; font-size: 9px; }
+      .nav-icon { font-size: 17px; }
+      .nav-item span:last-child:not(.nav-icon) { display: none; }
+      .nav-count { position: absolute; margin: -19px 0 0 22px; }
+      main { padding: 0 20px 26px; }
+      .topbar { height: 62px; }
+      .breadcrumbs { display: none; }
+      .top-actions { width: 100%; justify-content: flex-end; }
+      .profile-label { display: none; }
+      .profile-button { padding: 3px; }
+      .search-box { width: min(100%, 310px); margin-right: auto; }
+      .welcome { padding-top: 23px; }
+      .dashboard-grid { grid-template-columns: 1fr; }
+      .feed-layout { grid-template-columns: minmax(0, 1fr); }
+      .feed-side { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .feed-side > .side-panel:first-child { grid-row: span 2; }
+      .right-column { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+      .right-column .side-panel:first-child { grid-row: span 2; }
+      .hero { min-height: 215px; }
+      .hero-copy { padding: 24px; }
+      .hero-art { min-height: 215px; }
+    }
+    @media (max-width: 520px) {
+      main { padding: 0 14px 20px; }
+      .topbar { gap: 8px; }
+      .search-box { width: auto; min-width: 0; flex: 1; }
+      .coin-pill { padding: 8px; }
+      .welcome { align-items: flex-start; flex-direction: column; gap: 13px; padding: 19px 0 16px; }
+      h1 { font-size: 26px; }
+      .welcome-actions { width: 100%; }
+      .welcome-actions .button { flex: 1; }
+      .hero { min-height: 235px; grid-template-columns: 1fr; }
+      .hero-copy { padding: 24px 21px; }
+      .hero h2 { max-width: 280px; font-size: 25px; }
+      .hero p { max-width: 270px; }
+      .hero-art { position: absolute; inset: 0; min-height: 0; opacity: .33; background-image: linear-gradient(90deg, #183f32 3%, rgb(24 63 50 / 15%)), url("https://images.unsplash.com/photo-1606503153255-59d8b8b821f2?auto=format&fit=crop&w=900&q=80"); }
+      .float-tag { right: 12px; bottom: 12px; }
+      .dashboard-grid { padding-top: 21px; }
+      .game-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+      .game-thumb { height: 100px; }
+      .right-column { grid-template-columns: 1fr; }
+      .right-column .side-panel:first-child { grid-row: auto; }
+      .feed-side { grid-template-columns: 1fr; }
+      .feed-side > .side-panel:first-child { grid-row: auto; }
+      .stories { gap: 13px; padding: 12px; }
+      .post-media { max-height: 320px; }
+      .right-column .side-panel { padding: 13px; }
+      .game-modal { padding: 19px 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar" aria-label="Main navigation">
+      <a class="brand" href="#home" aria-label="Playroom home"><span class="brand-mark">✳</span> playroom</a>
+      <nav>
+        <p class="side-label">Menu</p>
+        <div class="nav-list">
+          <button class="nav-item active" data-nav="Discover"><span class="nav-icon">⌂</span><span>Discover</span></button>
+          <button class="nav-item" data-nav="My games"><span class="nav-icon">▣</span><span>My games</span></button>
+          <button class="nav-item" data-nav="Friends"><span class="nav-icon">♧</span><span>Friends</span><span class="nav-count">3</span></button>
+          <button class="nav-item" data-nav="Events"><span class="nav-icon">✳</span><span>Events</span></button>
+        </div>
+      </nav>
+      <div class="sidebar-spacer"></div>
+      <div class="invite-card">
+        <b>Invite friends to play.</b>
+        <p>Start a room and share the invite.</p>
+        <button data-action="invite">Invite a friend&nbsp; ↗</button>
+      </div>
+    </aside>
+
+    <main id="home">
+      <header class="topbar">
+        <div class="header-start"><button class="back-button" id="back-home" hidden aria-label="Back to Discover">← <span>Back</span></button><span class="breadcrumbs">Playroom&nbsp; / &nbsp;<b>Discover</b></span></div>
+        <div class="top-actions">
+          <button class="icon-button" id="home-button" aria-label="Go to home" title="Home">⌂</button>
+          <label class="search-box"><span aria-hidden="true">⌕</span><input id="game-search" type="search" placeholder="Find your next game" aria-label="Search games"></label>
+          <div class="coin-pill" title="Demo balance"><span>🟡</span><span id="coin-count">1,240</span></div>
+          <button class="icon-button" aria-label="Notifications" data-action="notifications">♧</button>
+          <div class="profile-wrap">
+            <button class="profile-button" id="profile-toggle" aria-label="Arjun Mehta profile" aria-haspopup="menu" aria-expanded="false"><span class="avatar">🧑🏽</span><span class="profile-label"><b id="profile-name">Arjun Mehta</b><small>Level 08</small></span><span aria-hidden="true">⌄</span></button>
+            <div class="profile-menu" id="profile-menu" role="menu" hidden><button role="menuitem" data-profile-action="profile">My profile</button><button role="menuitem" data-profile-action="settings">Account settings</button><button role="menuitem" data-profile-action="logout">Log out</button></div>
+          </div>
+        </div>
+      </header>
+
+      <div class="content">
+        <section id="discover-view">
+        <section class="welcome">
+          <div><p class="eyebrow"><span>✦</span> FRIEND UPDATES</p><h1>Your feed</h1><p class="welcome-copy">Recent posts and activity from your friends.</p></div>
+          <div class="welcome-actions"><button class="button button-secondary" data-action="invite"><span>＋</span> Invite friends</button><button class="button button-primary" data-open-game><span>▶</span> Play now</button></div>
+        </section>
+
+        <section id="birthday-banner" class="birthday-banner" hidden aria-live="polite"><h2 id="birthday-title"></h2><p id="birthday-quote"></p></section>
+        <div class="feed-layout">
+          <section class="feed-column" aria-label="Social feed">
+            <div class="stories" aria-label="Friend stories">
+              <button class="story" data-story="Your story"><span class="story-avatar">＋</span><span class="story-name">Your story</span></button>
+              <button class="story" data-story="Ananya Rao"><span class="story-avatar">👩🏻‍🎤</span><span class="story-name">Ananya</span></button>
+              <button class="story" data-story="Kabir Singh"><span class="story-avatar" style="background:#ffe1c7">👨🏾‍🚀</span><span class="story-name">Kabir</span></button>
+              <button class="story" data-story="Diya Patel"><span class="story-avatar" style="background:#d9e9f4">🧑🏻‍🎨</span><span class="story-name">Diya</span></button>
+              <button class="story" data-story="Rohan Das"><span class="story-avatar" style="background:#f4ddae">🧑🏽‍🚴</span><span class="story-name">Rohan</span></button>
+              <button class="story" data-story="Meera Joshi"><span class="story-avatar" style="background:#d5eadc">👩🏾‍🎨</span><span class="story-name">Meera</span></button>
+            </div>
+
+            <form class="post-composer" id="post-composer">
+              <span class="avatar composer-avatar">🧑🏽</span>
+              <div class="composer-main"><input id="post-input" type="text" maxlength="240" placeholder="What are you playing today, Arjun?" aria-label="Write a post"><div class="composer-tools"><button class="composer-tool" type="button" data-compose="photo"><span>▧</span>Photo</button><button class="composer-tool" type="button" data-compose="game"><span>🎮</span>Game</button><button class="composer-tool" type="button" data-compose="mood"><span>☺</span>Feeling</button><button class="button button-primary" type="submit" style="min-height:30px;padding:0 12px">Post</button></div></div>
+            </form>
+
+            <article class="post-card">
+              <div class="post-head"><span class="avatar post-avatar">👩🏻‍🎤</span><span class="post-author"><b>Ananya Rao</b><small>Playing with friends · 18 min</small></span><button class="post-menu" aria-label="Post options" data-action="post-menu">···</button></div>
+              <p class="post-copy">Unexpectedly intense Ludo finals at lunch 😅 <strong>#oneMoreRound</strong></p>
+              <div class="post-meta"><span class="like-count">💚 &nbsp;24 likes</span><span>8 comments</span></div>
+              <div class="post-actions"><button class="post-action" data-like>♡ &nbsp;Like</button><button class="post-action" data-comment>▢ &nbsp;Comment</button><button class="post-action" data-share>↗ &nbsp;Share</button></div>
+              <form class="post-comments"><input type="text" maxlength="180" placeholder="Write a kind comment…" aria-label="Write a comment"><button type="submit">Send</button></form>
+              <div class="post-game"><span class="post-game-icon">🎲</span><span class="post-game-copy"><b>Join Ananya's next game</b><small>Ludo · 2 spots open</small></span><button class="button button-primary" data-invite="Ananya">Join</button></div>
+            </article>
+
+            <article class="post-card">
+              <div class="post-head"><span class="avatar post-avatar" style="background:#d9e9f4">🧑🏻‍🎨</span><span class="post-author"><b>Diya Patel</b><small>Game result · 1 hr</small></span><button class="post-menu" aria-label="Post options" data-action="post-menu">···</button></div>
+              <p class="post-copy">Three rounds, one very close finish. GG, Kabir! 🏆 Who's up for a rematch?</p>
+              <div class="post-game" style="margin-top:2px"><span class="post-game-icon" style="background:#d9e9f4">⭕</span><span class="post-game-copy"><b>Tic-Tac-Toe · Draw</b><small>Diya &amp; Kabir · 2 min match</small></span><button class="button button-primary" data-open-game>Play</button></div>
+              <div class="post-meta"><span class="like-count">💚 &nbsp;12 likes</span><span>3 comments</span></div>
+              <div class="post-actions"><button class="post-action" data-like>♡ &nbsp;Like</button><button class="post-action" data-comment>▢ &nbsp;Comment</button><button class="post-action" data-share>↗ &nbsp;Share</button></div>
+              <form class="post-comments"><input type="text" maxlength="180" placeholder="Write a kind comment…" aria-label="Write a comment"><button type="submit">Send</button></form>
+            </article>
+            <p class="bottom-note">Demo feed · Posts and social details are sample content.</p>
+          </section>
+
+          <aside class="feed-side" aria-label="Friends and games">
+            <section class="side-panel"><div class="section-head"><h2>Friends online <span style="color:#72ae78">· 3</span></h2><button class="text-button" data-action="friends">See all</button></div>
+              <div class="friend-row"><span class="friend-avatar"><span class="online-dot"></span>👩🏻‍🎤</span><span class="friend-name"><b>Ananya Rao</b><small>Exploring games</small></span><button class="invite-button" aria-label="Invite Ananya to play" data-invite="Ananya">＋</button></div>
+              <div class="friend-row"><span class="friend-avatar orange"><span class="online-dot"></span>👨🏾‍🚀</span><span class="friend-name"><b>Kabir Singh</b><small>Just finished a match</small></span><button class="invite-button" aria-label="Invite Kabir to play" data-invite="Kabir">＋</button></div>
+              <div class="friend-row"><span class="friend-avatar blue"><span class="online-dot"></span>🧑🏻‍🎨</span><span class="friend-name"><b>Diya Patel</b><small>Available to play</small></span><button class="invite-button" aria-label="Invite Diya to play" data-invite="Diya">＋</button></div>
+            </section>
+            <section class="side-panel"><div class="section-head"><h2>Games</h2></div><div class="games-panel">
+              <button class="mini-game" data-open-game aria-label="Play Tic-Tac-Toe solo against the bot"><span class="mini-game-thumb">⭕</span><span><b>Tic-Tac-Toe</b><small>1 player · vs bot</small></span><span class="game-mode-label">SOLO</span></button>
+              <button class="mini-game" data-action="game-preview" data-game-name="Ludo"><span class="mini-game-thumb">🎲</span><span><b>Ludo</b><small>2–4 players</small></span></button>
+              <button class="mini-game" data-action="game-preview" data-game-name="Chess"><span class="mini-game-thumb">♟</span><span><b>Chess</b><small>2 players</small></span></button>
+            </div></section>
+            <section class="side-panel reward-panel"><div class="section-head"><h2>Daily drop</h2><span aria-hidden="true">☀</span></div><p>A little something for showing up. Come back tomorrow for another.</p><button class="button" id="claim-reward"><span>✦</span> Collect 40 coins</button></section>
+            <section class="side-panel tournament-panel"><div class="section-head"><h2>On the calendar</h2><span aria-hidden="true">↗</span></div><div class="tourney-row"><span class="date-mark">OCT<b>08</b></span><span class="tourney-copy"><b>Friday Friends Cup</b><small>Casual · 4 players</small></span><button class="invite-button" aria-label="Get event details" data-action="event">↗</button></div></section>
+          </aside>
+        </div>
+        </section>
+        <section class="catalog-view" id="catalog-view" hidden aria-labelledby="catalog-title">
+          <div class="catalog-heading"><div><p class="eyebrow">YOUR LIBRARY</p><h1 id="catalog-title">My games</h1><p>Choose a game to see its available play modes.</p></div><button class="button button-primary" data-open-game>▶ &nbsp;Play Tic-Tac-Toe</button></div>
+          <div id="catalog-groups"></div>
+          <p class="bottom-note">Tic-Tac-Toe is playable now. Other titles show their planned player mode and are catalog previews in this demo.</p>
+        </section>
+        <section class="friends-view" id="friends-view" hidden aria-labelledby="friends-title">
+          <div class="friends-heading"><div><p class="eyebrow">YOUR PEOPLE</p><h1 id="friends-title">Friends</h1><p id="friends-subtitle">Open a conversation or find a friend to message.</p></div><button class="button button-secondary" id="friends-back" hidden>All friends</button></div>
+          <section id="friends-directory">
+            <div class="friends-tabs"><button class="friends-tab selected" id="friends-tab-all">All friends</button><button class="friends-tab" id="friends-tab-chats">Chats <span id="chat-count"></span></button></div>
+            <div class="friends-empty" id="no-friends-empty" hidden>No friends to show yet.</div>
+            <div class="friends-grid" id="friends-grid"></div>
+          </section>
+          <section class="chat-layout" id="chat-layout" hidden>
+            <aside class="chat-list"><div class="chat-list-head">Chats <button class="text-button" id="chat-all-friends">Friends</button></div><div class="chat-list-body" id="chat-list-body"></div></aside>
+            <section class="chat-thread" aria-label="Chat conversation">
+              <header class="chat-thread-head"><span class="chat-person-avatar" id="thread-avatar"></span><span><b id="thread-name"></b><small id="thread-status"></small></span><button class="text-button" id="thread-profile" style="margin-left:auto">Profile</button></header>
+              <div class="chat-messages" id="chat-messages" aria-live="polite"></div>
+              <div class="chat-demo-note">Demo chat is saved only in this browser. Friends cannot receive these messages.</div>
+              <form class="chat-compose" id="chat-compose"><input id="chat-input" maxlength="500" placeholder="Write a message…" aria-label="Write a message" autocomplete="off"><button class="button button-primary" type="submit">Send</button></form>
+            </section>
+          </section>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="game-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <section class="game-modal">
+      <div class="modal-top"><div><h2 id="modal-title">Tic-Tac-Toe</h2><p>A tiny game of nerve and timing.</p></div><button class="close-button" aria-label="Close game" data-close>×</button></div>
+      <div class="game-mode" role="group" aria-label="Choose game mode"><button class="mode-button selected" data-mode="bot">Play the bot</button><button class="mode-button" data-mode="local">Pass &amp; play</button></div>
+      <p class="match-status" id="match-status" aria-live="polite">Your turn · You are X</p>
+      <div class="board" id="board" role="grid" aria-label="Tic-Tac-Toe board"></div>
+      <div class="modal-actions"><button class="button button-primary" id="new-game">↻ &nbsp;New game</button><button class="button button-secondary" data-close>Done</button></div>
+    </section>
+  </div>
+  <div class="modal-backdrop story-open" id="story-modal" role="dialog" aria-modal="true" aria-label="Friend story"><section class="story-modal"><div class="story-progress"></div><button class="close-button story-close" aria-label="Close story" data-close-story>×</button><h2 id="story-name">Ananya Rao</h2><p>A moment from today.</p></section></div>
+  <div class="launch-backdrop" id="launch-modal" role="dialog" aria-modal="true" aria-labelledby="launch-game-name"><section class="launch-panel"><div class="launch-title"><span class="catalog-logo" id="launch-game-logo">🎮</span><div><h2 id="launch-game-name">Game</h2><p id="launch-game-summary"></p></div><button class="close-button" style="margin-left:auto" aria-label="Close game options" data-close-launch>×</button></div><p class="launch-note" id="launch-game-note"></p><div class="launch-modes" id="launch-modes"></div><div class="launch-foot"><button class="button button-secondary" data-close-launch>Close</button></div></section></div>
+  <div class="setup-backdrop" id="setup-modal" role="dialog" aria-modal="true" aria-labelledby="setup-title"><form class="setup-panel" id="setup-form"><h1 id="setup-title">Create your player profile</h1><p>Set up a local demo profile to personalize your feed and age-appropriate game options.</p><div class="setup-fields"><label>Display name<input id="signup-name" name="displayName" autocomplete="nickname" maxlength="32" required placeholder="What should we call you?"></label><label>Date of birth<input id="signup-dob" name="dob" type="date" required></label><label>Gender (optional)<select id="signup-gender" name="gender"><option value="unspecified">Prefer not to say</option><option value="boy">Boy / man</option><option value="girl">Girl / woman</option><option value="nonbinary">Non-binary</option></select></label><label class="setup-check"><input id="birthday-optin" type="checkbox"><span>Save only my birthday month and day in this browser so the app can show me a birthday greeting.</span></label><div class="birthday-note">Your full date of birth is used only to check the age requirement and is not saved by this demo. Users under 18 cannot use random stranger matchmaking.</div><p class="setup-error" id="setup-error" aria-live="polite"></p><button class="button button-primary" type="submit">Continue</button></div></form></div>
+  <div class="modal-backdrop" id="friend-profile-modal" role="dialog" aria-modal="true" aria-labelledby="friend-profile-name"><section class="profile-dialog"><button class="close-button" aria-label="Close profile" data-close-friend-profile>×</button><span class="profile-dialog-avatar" id="friend-profile-avatar"></span><h2 id="friend-profile-name"></h2><p id="friend-profile-status"></p><button class="button button-primary" id="friend-profile-message">Message</button></section></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (() => {
+      const modal = document.querySelector("#game-modal");
+      const storyModal = document.querySelector("#story-modal");
+      const boardElement = document.querySelector("#board");
+      const statusElement = document.querySelector("#match-status");
+      const toastElement = document.querySelector("#toast");
+      const searchInput = document.querySelector("#game-search");
+      let cells = Array(9).fill("");
+      let turn = "X";
+      let winner = null;
+      let mode = "bot";
+      let toastTimer;
+      let coins = 1240;
+
+      const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+      const winnerFor = (state) => wins.map((line) => line.map((index) => state[index])).find((line) => line[0] && line.every((mark) => mark === line[0]))?.[0] ?? null;
+
+      function notify(message) {
+        toastElement.textContent = message;
+        toastElement.classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toastElement.classList.remove("show"), 2500);
+      }
+
+      function announceGame() {
+        winner = winnerFor(cells);
+        if (winner) statusElement.textContent = mode === "bot" ? (winner === "X" ? "You win! Nice one." : "The bot got this round. Rematch?") : `Player ${winner} wins!`;
+        else if (cells.every(Boolean)) statusElement.textContent = "It's a draw. Run it back?";
+        else statusElement.textContent = mode === "bot" ? (turn === "X" ? "Your turn · You are X" : "Bot is thinking…") : `Player ${turn}'s turn`;
+      }
+
+      function renderBoard() {
+        boardElement.replaceChildren();
+        cells.forEach((mark, index) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = `cell${mark === "X" ? " x-mark" : mark === "O" ? " o-mark" : ""}`;
+          button.setAttribute("role", "gridcell");
+          button.setAttribute("aria-label", mark ? `Cell ${index + 1}: ${mark}` : `Cell ${index + 1}: empty`);
+          button.textContent = mark;
+          button.disabled = Boolean(mark || winner || cells.every(Boolean) || (mode === "bot" && turn === "O"));
+          button.addEventListener("click", () => play(index));
+          boardElement.append(button);
+        });
+        announceGame();
+      }
+
+      function minimax(state, isMaximizing) {
+        const result = winnerFor(state);
+        if (result === "O") return { score: 10 };
+        if (result === "X") return { score: -10 };
+        if (state.every(Boolean)) return { score: 0 };
+        let best = { score: isMaximizing ? -Infinity : Infinity, index: -1 };
+        state.forEach((cell, index) => {
+          if (cell) return;
+          state[index] = isMaximizing ? "O" : "X";
+          const score = minimax(state, !isMaximizing).score;
+          state[index] = "";
+          if ((isMaximizing && score > best.score) || (!isMaximizing && score < best.score)) best = { score, index };
+        });
+        return best;
+      }
+
+      function play(index) {
+        if (cells[index] || winner || cells.every(Boolean) || (mode === "bot" && turn !== "X")) return;
+        cells[index] = turn;
+        turn = turn === "X" ? "O" : "X";
+        renderBoard();
+        if (mode === "bot" && !winner && !cells.every(Boolean)) {
+          setTimeout(() => {
+            if (modal.classList.contains("open") && mode === "bot" && turn === "O" && !winner) {
+              const move = minimax(cells, true).index;
+              if (move >= 0) cells[move] = "O";
+              turn = "X";
+              renderBoard();
+            }
+          }, 350);
+        }
+      }
+
+      function resetGame() { cells = Array(9).fill(""); turn = "X"; winner = null; renderBoard(); }
+      function openGame() { modal.classList.add("open"); resetGame(); document.querySelector(".close-button").focus(); }
+      function closeGame() { modal.classList.remove("open"); }
+
+      document.querySelectorAll("[data-open-game], [data-game='tictactoe']").forEach((button) => button.addEventListener("click", openGame));
+      document.querySelectorAll("[data-close]").forEach((button) => button.addEventListener("click", closeGame));
+      document.querySelector("#new-game").addEventListener("click", resetGame);
+      modal.addEventListener("click", (event) => { if (event.target === modal) closeGame(); });
+      document.addEventListener("keydown", (event) => {
+        if (event.key !== "Escape") return;
+        if (modal.classList.contains("open")) closeGame();
+        if (storyModal.classList.contains("open")) storyModal.classList.remove("open");
+      });
+
+      document.querySelectorAll("[data-mode]").forEach((button) => button.addEventListener("click", () => {
+        mode = button.dataset.mode;
+        document.querySelectorAll("[data-mode]").forEach((option) => option.classList.toggle("selected", option === button));
+        resetGame();
+      }));
+
+      document.querySelectorAll(".filter-chip").forEach((button) => button.addEventListener("click", () => {
+        document.querySelectorAll(".filter-chip").forEach((chip) => chip.classList.toggle("selected", chip === button));
+        const category = button.dataset.filter;
+        document.querySelectorAll(".game-card").forEach((card) => { card.hidden = category !== "All" && card.dataset.category !== category; });
+      }));
+
+      searchInput.addEventListener("input", () => {
+        const query = searchInput.value.trim().toLowerCase();
+        document.querySelectorAll(".post-card").forEach((post) => { post.hidden = !post.innerText.toLowerCase().includes(query); });
+        document.querySelectorAll(".mini-game").forEach((game) => { game.hidden = !game.innerText.toLowerCase().includes(query); });
+      });
+
+      document.querySelectorAll("[data-story]").forEach((story) => story.addEventListener("click", () => {
+        const name = story.dataset.story;
+        if (name === "Your story") return notify("Story sharing is not enabled in this demo yet.");
+        document.querySelector("#story-name").textContent = name;
+        storyModal.classList.add("open");
+        storyModal.querySelector("[data-close-story]").focus();
+      }));
+      storyModal.addEventListener("click", (event) => { if (event.target === storyModal) storyModal.classList.remove("open"); });
+      storyModal.querySelector("[data-close-story]").addEventListener("click", () => storyModal.classList.remove("open"));
+
+      document.querySelector("#post-composer").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const input = document.querySelector("#post-input");
+        const text = input.value.trim();
+        if (!text) return notify("Write something first, then share it with your crew.");
+
+        const post = document.createElement("article");
+        post.className = "post-card";
+        const head = document.createElement("div");
+        head.className = "post-head";
+        const avatar = document.createElement("span");
+        avatar.className = "avatar post-avatar";
+        avatar.textContent = "🧑🏽";
+        const author = document.createElement("span");
+        author.className = "post-author";
+        const authorName = document.createElement("b");
+        authorName.textContent = "Arjun Mehta";
+        const time = document.createElement("small");
+        time.textContent = "Just now";
+        author.append(authorName, time);
+        head.append(avatar, author);
+
+        const copy = document.createElement("p");
+        copy.className = "post-copy";
+        copy.textContent = text;
+        post.append(head, copy);
+        post.insertAdjacentHTML("beforeend", '<div class="post-meta"><span class="like-count">0 likes</span><span>0 comments</span></div><div class="post-actions"><button class="post-action" data-like>♡ &nbsp;Like</button><button class="post-action" data-comment>▢ &nbsp;Comment</button><button class="post-action" data-share>↗ &nbsp;Share</button></div><form class="post-comments"><input type="text" maxlength="180" placeholder="Write a kind comment…" aria-label="Write a comment"><button type="submit">Send</button></form>');
+        const feed = document.querySelector(".feed-column");
+        feed.insertBefore(post, feed.children[2]);
+        input.value = "";
+        notify("Your post was added to this demo feed.");
+      });
+
+      document.body.addEventListener("click", (event) => {
+        const likeButton = event.target.closest("[data-like]");
+        if (likeButton) {
+          const count = likeButton.closest(".post-card").querySelector(".like-count");
+          const wasLiked = likeButton.dataset.liked === "true";
+          const number = Number(count.textContent.match(/\d+/)?.[0] ?? 0) + (wasLiked ? -1 : 1);
+          likeButton.dataset.liked = String(!wasLiked);
+          likeButton.classList.toggle("liked", !wasLiked);
+          likeButton.textContent = wasLiked ? "♡  Like" : "♥  Liked";
+          count.textContent = `${number} likes`;
+          return;
+        }
+        const commentButton = event.target.closest("[data-comment]");
+        if (commentButton) {
+          const form = commentButton.closest(".post-card").querySelector(".post-comments");
+          form.classList.toggle("open");
+          if (form.classList.contains("open")) form.querySelector("input").focus();
+          return;
+        }
+        if (event.target.closest("[data-share]")) notify("Share link copied (demo only).");
+      });
+
+      document.body.addEventListener("submit", (event) => {
+        if (!event.target.matches(".post-comments")) return;
+        event.preventDefault();
+        const input = event.target.querySelector("input");
+        const text = input.value.trim();
+        if (!text) return;
+        const comment = document.createElement("p");
+        comment.className = "post-copy";
+        comment.style.paddingBottom = "8px";
+        comment.textContent = `Arjun Mehta: ${text}`;
+        event.target.before(comment);
+        const meta = event.target.closest(".post-card").querySelector(".post-meta span:last-child");
+        const count = Number(meta.textContent.match(/\d+/)?.[0] ?? 0) + 1;
+        meta.textContent = `${count} comments`;
+        input.value = "";
+        notify("Comment added to this demo post.");
+      });
+
+      document.querySelectorAll("[data-action='game-preview']").forEach((button) => button.addEventListener("click", () => notify(`${button.dataset.gameName} is a preview. Tic-Tac-Toe is playable in this demo.`)));
+      document.querySelectorAll("[data-action='post-menu']").forEach((button) => button.addEventListener("click", () => notify("Post options and reporting are demo-only.")));
+
+      const profileToggle = document.querySelector("#profile-toggle");
+      const profileMenu = document.querySelector("#profile-menu");
+      profileToggle.addEventListener("click", () => {
+        profileMenu.hidden = !profileMenu.hidden;
+        profileToggle.setAttribute("aria-expanded", String(!profileMenu.hidden));
+      });
+      document.querySelectorAll("[data-profile-action]").forEach((button) => button.addEventListener("click", () => {
+        profileMenu.hidden = true;
+        profileToggle.setAttribute("aria-expanded", "false");
+        notify(`${button.textContent} is demo-only.`);
+      }));
+      document.addEventListener("click", (event) => {
+        if (!event.target.closest(".profile-wrap")) {
+          profileMenu.hidden = true;
+          profileToggle.setAttribute("aria-expanded", "false");
+        }
+      });
+
+      document.querySelectorAll("[data-invite]").forEach((button) => button.addEventListener("click", () => notify(`Game invite ready for ${button.dataset.invite}. Multiplayer invites are demo-only.`)));
+      document.querySelectorAll("[data-action='invite']").forEach((button) => button.addEventListener("click", () => notify("Invite link copied: playroom.example/invite/demo")));
+      document.querySelectorAll("[data-action='notifications']").forEach((button) => button.addEventListener("click", () => notify("You're all caught up.")));
+      document.querySelectorAll("[data-action='friends']").forEach((button) => button.addEventListener("click", () => document.querySelector('[data-nav="Friends"]').click()));
+      document.querySelectorAll("[data-action='event']").forEach((button) => button.addEventListener("click", () => notify("Friday Friends Cup · October 8 · Casual 4-player event.")));
+      document.querySelectorAll("[data-action='all-games']").forEach((button) => button.addEventListener("click", (event) => { event.preventDefault(); document.querySelector("#games")?.scrollIntoView({ behavior: "smooth" }); }));
+
+      function showAppView(name) {
+        document.querySelectorAll("[data-nav]").forEach((item) => item.classList.toggle("active", item.dataset.nav === name));
+        document.querySelector(".breadcrumbs").innerHTML = `Playroom&nbsp; / &nbsp;<b>${name}</b>`;
+        const showCatalog = name === "My games";
+        const showFriends = name === "Friends";
+        document.querySelector("#discover-view").hidden = showCatalog || showFriends;
+        document.querySelector("#catalog-view").hidden = !showCatalog;
+        document.querySelector("#friends-view").hidden = !showFriends;
+        document.querySelector("#back-home").hidden = name === "Discover";
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        if (showFriends) document.dispatchEvent(new CustomEvent("friends-open"));
+        if (name !== "Discover" && !showCatalog && !showFriends) notify(`${name} preview · this section is sample content.`);
+      }
+
+      document.querySelectorAll("[data-nav]").forEach((button) => button.addEventListener("click", () => showAppView(button.dataset.nav)));
+      document.querySelector("#back-home").addEventListener("click", () => {
+        if (!document.querySelector("#friends-view").hidden && !document.querySelector("#chat-layout").hidden) {
+          document.querySelector("#friends-back").click();
+          return;
+        }
+        showAppView("Discover");
+      });
+      document.querySelector("#home-button").addEventListener("click", () => showAppView("Discover"));
+      document.querySelector(".brand").addEventListener("click", (event) => {
+        event.preventDefault();
+        showAppView("Discover");
+      });
+
+
+      document.querySelector("#claim-reward").addEventListener("click", (event) => {
+        const button = event.currentTarget;
+        if (button.disabled) return;
+        coins += 40;
+        document.querySelector("#coin-count").textContent = coins.toLocaleString("en-IN");
+        button.disabled = true;
+        button.classList.add("reward-done");
+        button.textContent = "✓  Collected";
+        notify("Daily drop collected · 40 coins added!");
+      });
+
+      renderBoard();
+    })();
+  </script>
+  <script>
+    (() => {
+      const games = [
+        { category: "Board", id: "tictactoe", name: "Tic-Tac-Toe", icon: "⭕", players: "1–2 players", solo: true, multi: true, playable: true },
+        { category: "Board", id: "ludo", name: "Ludo", icon: "🎲", players: "2–4 players", solo: true, multi: true },
+        { category: "Board", id: "chess", name: "Chess", icon: "♟", players: "1–2 players", solo: true, multi: true },
+        { category: "Board", id: "carrom", name: "Carrom", icon: "🔴", players: "2–4 players", solo: false, multi: true },
+        { category: "Board", id: "snakes-ladders", name: "Snakes & Ladders", icon: "🪜", players: "1–4 players", solo: true, multi: true },
+        { category: "Board", id: "checkers", name: "Checkers", icon: "⚫", players: "1–2 players", solo: true, multi: true },
+        { category: "Board", id: "connect-four", name: "Connect 4", icon: "🔴", players: "1–2 players", solo: true, multi: true },
+        { category: "Sports", id: "cricket", name: "Cricket", icon: "🏏", players: "1–4 players", solo: true, multi: true },
+        { category: "Sports", id: "penalty", name: "Penalty Shootout", icon: "⚽", players: "1–2 players", solo: true, multi: true },
+        { category: "Sports", id: "table-tennis", name: "Table Tennis", icon: "🏓", players: "1–2 players", solo: true, multi: true },
+        { category: "Sports", id: "air-hockey", name: "Air Hockey", icon: "🏒", players: "2 players", solo: false, multi: true },
+        { category: "Cards", id: "rummy", name: "Rummy", icon: "🂡", players: "2–6 players", solo: false, multi: true },
+        { category: "Cards", id: "poker", name: "Poker", icon: "🃏", players: "2–8 players", solo: false, multi: true },
+        { category: "Cards", id: "colour-cards", name: "Colour Cards", icon: "🎴", players: "2–8 players", solo: false, multi: true },
+        { category: "Cards", id: "teen-patti", name: "Teen Patti (for fun)", icon: "🃏", players: "2–6 players", solo: false, multi: true },
+        { category: "Cards", id: "bluff", name: "Bluff", icon: "🎭", players: "3–6 players", solo: false, multi: true },
+        { category: "Word & Quiz", id: "trivia", name: "Trivia", icon: "🧠", players: "1–8 players", solo: true, multi: true },
+        { category: "Word & Quiz", id: "hangman", name: "Hangman", icon: "🔤", players: "1–2 players", solo: true, multi: true },
+        { category: "Word & Quiz", id: "word-chain", name: "Word Chain", icon: "🔗", players: "2–8 players", solo: false, multi: true },
+        { category: "Word & Quiz", id: "draw-guess", name: "Draw & Guess", icon: "✏️", players: "2–8 players", solo: false, multi: true },
+        { category: "Word & Quiz", id: "emoji-guess", name: "Emoji Guess", icon: "😄", players: "1–8 players", solo: true, multi: true },
+        { category: "Party", id: "werewolf", name: "Werewolf", icon: "🐺", players: "5–12 players", solo: false, multi: true },
+        { category: "Party", id: "spyfall", name: "Spyfall", icon: "🕵️", players: "3–8 players", solo: false, multi: true },
+        { category: "Party", id: "would-you-rather", name: "Would You Rather", icon: "🤔", players: "2–12 players", solo: false, multi: true },
+        { category: "Party", id: "truth-dare", name: "Truth or Dare", icon: "🎯", players: "2–8 players", solo: false, multi: true },
+        { category: "Arcade", id: "snake", name: "Snake", icon: "🐍", players: "1 player", solo: true, multi: false },
+        { category: "Arcade", id: "pong", name: "Pong", icon: "🏓", players: "1–2 players", solo: true, multi: true },
+        { category: "Arcade", id: "memory-match", name: "Memory Match", icon: "🧩", players: "1 player", solo: true, multi: false },
+        { category: "Arcade", id: "reaction-race", name: "Reaction Race", icon: "⚡", players: "1–8 players", solo: true, multi: true },
+        { category: "Strategy & Puzzle", id: "sudoku", name: "Sudoku", icon: "🔢", players: "1 player", solo: true, multi: false },
+        { category: "Strategy & Puzzle", id: "tile-puzzle", name: "Tile Puzzle", icon: "🟦", players: "1 player", solo: true, multi: false },
+        { category: "Strategy & Puzzle", id: "tower-defense", name: "Tower Defense", icon: "🏰", players: "1–4 players", solo: true, multi: true },
+        ...[
+          ["othello", "Othello", "⚫", "1–2 players", true, true],
+          ["mancala", "Mancala", "🪨", "1–2 players", true, true],
+          ["battleship", "Battleship", "🚢", "1–2 players", true, true],
+          ["dots-boxes", "Dots & Boxes", "🔲", "1–2 players", true, true],
+          ["nine-morris", "Nine Men's Morris", "♟", "2 players", false, true],
+          ["go", "Go", "⚫", "1–2 players", true, true],
+          ["backgammon", "Backgammon", "🎲", "2 players", true, true],
+          ["peg-solitaire", "Peg Solitaire", "📍", "1 player", true, false],
+          ["fox-geese", "Fox & Geese", "🦊", "2 players", true, true],
+          ["shogi", "Shogi", "♟", "2 players", true, true]
+        ].map(([id, name, icon, players, solo, multi]) => ({ category: "Board", id, name, icon, players, solo, multi })),
+        ...[
+          ["basketball-shot", "Basketball Shot", "🏀", "1–4 players", true, true],
+          ["volleyball", "Volleyball", "🏐", "2–4 players", false, true],
+          ["bowling", "Bowling", "🎳", "1–4 players", true, true],
+          ["mini-golf", "Mini Golf", "⛳", "1–4 players", true, true],
+          ["badminton", "Badminton", "🏸", "1–2 players", true, true],
+          ["pool", "Pool", "🎱", "1–2 players", true, true],
+          ["ski-race", "Ski Race", "🎿", "1–4 players", true, true],
+          ["bike-race", "Bike Race", "🚴", "1–4 players", true, true],
+          ["archery", "Archery", "🏹", "1–4 players", true, true],
+          ["long-jump", "Long Jump", "🏃", "1–4 players", true, true]
+        ].map(([id, name, icon, players, solo, multi]) => ({ category: "Sports", id, name, icon, players, solo, multi })),
+        ...[
+          ["hearts", "Hearts", "♥", "3–4 players", false, true],
+          ["spades", "Spades", "♠", "4 players", false, true],
+          ["crazy-eights", "Crazy Eights", "🂸", "2–5 players", false, true],
+          ["go-fish", "Go Fish", "🐟", "2–6 players", true, true],
+          ["solitaire", "Solitaire", "🂡", "1 player", true, false],
+          ["freecell", "FreeCell", "🂱", "1 player", true, false],
+          ["spider-solitaire", "Spider Solitaire", "🕷", "1 player", true, false],
+          ["euchre", "Euchre", "🃏", "4 players", false, true],
+          ["old-maid", "Old Maid", "🃏", "2–6 players", false, true]
+        ].map(([id, name, icon, players, solo, multi]) => ({ category: "Cards", id, name, icon, players, solo, multi })),
+        ...[
+          ["word-search", "Word Search", "🔎", "1 player", true, false],
+          ["crossword", "Crossword", "📝", "1–2 players", true, true],
+          ["anagrams", "Anagrams", "🔤", "1–4 players", true, true],
+          ["boggle", "Letter Scramble", "🔠", "1–4 players", true, true],
+          ["letter-ladder", "Letter Ladder", "🪜", "1–4 players", true, true],
+          ["quick-math", "Quick Math", "➗", "1–4 players", true, true],
+          ["riddle-race", "Riddle Race", "❓", "1–8 players", true, true],
+          ["spellbee", "Spell Bee", "🐝", "1–8 players", true, true],
+          ["picture-clues", "Picture Clues", "🖼", "1–6 players", true, true],
+          ["fact-or-fiction", "Fact or Fiction", "💡", "2–8 players", false, true]
+        ].map(([id, name, icon, players, solo, multi]) => ({ category: "Word & Quiz", id, name, icon, players, solo, multi })),
+        ...[
+          ["charades", "Charades", "🎭", "3–10 players", false, true],
+          ["guess-who", "Guess Who?", "🧐", "2–6 players", false, true],
+          ["sound-guess", "Sound Guess", "🔊", "2–8 players", false, true],
+          ["heads-up", "Heads Up", "🙆", "2–8 players", false, true],
+          ["hot-take", "Hot Take", "🌶", "3–12 players", false, true],
+          ["story-circle", "Story Circle", "📖", "3–10 players", false, true],
+          ["secret-word", "Secret Word", "🤫", "3–8 players", false, true],
+          ["odd-one-out", "Odd One Out", "🔍", "3–10 players", false, true],
+          ["quick-draw", "Quick Draw", "✏️", "2–8 players", false, true]
+        ].map(([id, name, icon, players, solo, multi]) => ({ category: "Party", id, name, icon, players, solo, multi })),
+        ...[
+          ["brick-breaker", "Brick Breaker", "🧱", "1 player", true, false],
+          ["bubble-pop", "Bubble Pop", "🫧", "1 player", true, false],
+          ["space-dodger", "Space Dodger", "🚀", "1 player", true, false],
+          ["fruit-slice", "Fruit Slice", "🍉", "1 player", true, false],
+          ["endless-runner", "Endless Runner", "🏃", "1 player", true, false],
+          ["color-switch", "Color Switch", "🎨", "1 player", true, false],
+          ["whack-mole", "Whack-a-Mole", "🔨", "1 player", true, false],
+          ["block-drop", "Block Drop", "🟪", "1 player", true, false],
+          ["space-invaders", "Space Invaders", "👾", "1 player", true, false],
+          ["jetpack-dash", "Jetpack Dash", "🛩", "1 player", true, false]
+        ].map(([id, name, icon, players, solo, multi]) => ({ category: "Arcade", id, name, icon, players, solo, multi })),
+        ...[
+          ["minesweeper", "Minesweeper", "💣", "1 player", true, false],
+          ["nonogram", "Nonogram", "🟦", "1 player", true, false],
+          ["fifteen-puzzle", "15 Puzzle", "🔢", "1 player", true, false],
+          ["logic-grid", "Logic Grid", "🧠", "1 player", true, false],
+          ["hex", "Hex", "⬡", "1–2 players", true, true],
+          ["nim", "Nim", "🪵", "1–2 players", true, true],
+          ["lights-out", "Lights Out", "💡", "1 player", true, false],
+          ["pipe-connect", "Pipe Connect", "🔧", "1 player", true, false],
+          ["pattern-match", "Pattern Match", "🔷", "1 player", true, false],
+          ["maze-run", "Maze Run", "🌀", "1 player", true, false]
+        ].map(([id, name, icon, players, solo, multi]) => ({ category: "Strategy & Puzzle", id, name, icon, players, solo, multi })),
+        ...[
+          ["pachisi", "Pachisi", "🎲", "2–4 players", true, true],
+          ["alquerque", "Alquerque", "⚫", "2 players", true, true],
+          ["mak-yek", "Mak-Yek", "♟", "2 players", true, true],
+          ["halma", "Halma", "🔵", "2–4 players", true, true],
+          ["fox-hounds", "Fox and Hounds", "🦊", "2 players", true, true],
+          ["santorini", "Island Builders", "🏛", "2 players", true, true],
+          ["four-in-a-row", "Four in a Row", "🟡", "1–2 players", true, true],
+          ["gomoku", "Gomoku", "⚫", "1–2 players", true, true],
+          ["reversi", "Reversi", "⚪", "1–2 players", true, true],
+          ["peg-jump", "Peg Jump", "📍", "1 player", true, false],
+          ["chinese-checkers", "Chinese Checkers", "🔺", "2–6 players", true, true],
+          ["nine-mens-morris-mini", "Mill", "⭕", "2 players", true, true],
+          ["dominoes", "Dominoes", "🁣", "2–4 players", true, true],
+          ["domino-chain", "Domino Chain", "🁫", "2–4 players", true, true],
+          ["dots-corners", "Dots to Corners", "🔲", "2 players", true, true]
+        ].map(([id, name, icon, players, solo, multi]) => ({ category: "Board", id, name, icon, players, solo, multi })),
+        ...[
+          ["kabaddi", "Kabaddi Clash", "🤼", "2–8 players", false, true],
+          ["gully-cricket", "Gully Cricket", "🏏", "2–6 players", false, true],
+          ["cricket-quiz", "Cricket Quiz", "🏆", "1–8 players", true, true],
+          ["table-football", "Table Football", "⚽", "2–4 players", true, true],
+          ["darts", "Darts", "🎯", "1–4 players", true, true],
+          ["target-bowling", "Target Bowling", "🎳", "1–4 players", true, true],
+          ["race-track", "Race Track", "🏎", "1–4 players", true, true],
+          ["skateboard", "Skateboard Tricks", "🛹", "1 player", true, false],
+          ["surfing", "Surf Dash", "🏄", "1 player", true, false],
+          ["rowing-race", "Rowing Race", "🚣", "1–4 players", true, true],
+          ["fencing", "Foil Duel", "🤺", "1–2 players", true, true],
+          ["goalkeeper", "Goalkeeper Challenge", "🥅", "1 player", true, false],
+          ["free-kick", "Free Kick Challenge", "⚽", "1–2 players", true, true],
+          ["marble-race", "Marble Race", "🔵", "1–8 players", true, true],
+          ["hurdles", "Hurdles Sprint", "🏃", "1–4 players", true, true]
+        ].map(([id, name, icon, players, solo, multi]) => ({ category: "Sports", id, name, icon, players, solo, multi })),
+        ...[
+          ["gin-rummy", "Gin Rummy", "🂡", "2 players", false, true],
+          ["cribbage", "Cribbage", "🃏", "2–4 players", true, true],
+          ["pinochle", "Pinochle", "♠", "2–4 players", false, true],
+          ["bridge", "Bridge", "♥", "4 players", false, true],
+          ["canasta", "Canasta", "🂱", "2–6 players", false, true],
+          ["durak", "Durak", "🃏", "2–6 players", false, true],
+          ["president", "President", "👑", "3–7 players", false, true],
+          ["sevens", "Sevens", "7️⃣", "3–6 players", false, true],
+          ["thirty-one", "Thirty-One", "3️⃣", "2–6 players", false, true],
+          ["blackjack-practice", "Blackjack Practice", "🂫", "1 player", true, false],
+          ["pyramid-solitaire", "Pyramid Solitaire", "🔺", "1 player", true, false],
+          ["yukon-solitaire", "Yukon Solitaire", "🂭", "1 player", true, false],
+          ["ginny", "Ginny Cards", "🃏", "2–4 players", false, true],
+          ["card-memory", "Card Memory", "🂠", "1–2 players", true, true],
+          ["trick-taker", "Trick Taker", "🂡", "3–5 players", false, true]
+        ].map(([id, name, icon, players, solo, multi]) => ({ category: "Cards", id, name, icon, players, solo, multi })),
+        ...[
+          ["word-relay", "Word Relay", "🔤", "2–8 players", false, true],
+          ["word-association", "Word Association", "💭", "2–10 players", false, true],
+          ["category-rush", "Category Rush", "📚", "2–8 players", true, true],
+          ["missing-letter", "Missing Letter", "🔠", "1–6 players", true, true],
+          ["word-builder", "Word Builder", "🧱", "1–4 players", true, true],
+          ["vocabulary-voyage", "Vocabulary Voyage", "🧭", "1 player", true, false],
+          ["capital-cities", "Capital Cities Quiz", "🌍", "1–8 players", true, true],
+          ["science-sprint", "Science Sprint", "🧪", "1–8 players", true, true],
+          ["history-mix", "History Mix", "📜", "1–8 players", true, true],
+          ["number-guess", "Number Guess", "🔢", "1–4 players", true, true],
+          ["estimate-it", "Estimate It", "📏", "2–8 players", false, true],
+          ["true-false", "True or False", "✅", "1–8 players", true, true],
+          ["sound-trivia", "Sound Trivia", "🎵", "2–8 players", false, true],
+          ["movie-quotes", "Movie Quote Quiz", "🎬", "2–8 players", false, true],
+          ["food-quiz", "Food Around the World", "🍲", "1–8 players", true, true]
+        ].map(([id, name, icon, players, solo, multi]) => ({ category: "Word & Quiz", id, name, icon, players, solo, multi })),
+        ...[
+          ["emoji-story", "Emoji Story", "📖", "2–10 players", false, true],
+          ["caption-contest", "Caption Contest", "💬", "3–10 players", false, true],
+          ["secret-talent", "Secret Talent", "✨", "3–8 players", false, true],
+          ["mystery-person", "Mystery Person", "🕵️", "3–8 players", false, true],
+          ["team-pictionary", "Team Pictionary", "🖍", "4–12 players", false, true],
+          ["one-word", "One Word Clues", "💡", "3–8 players", false, true],
+          ["rhythm-copy", "Copy the Rhythm", "🥁", "2–8 players", true, true],
+          ["freeze-dance", "Freeze Dance", "🪩", "2–12 players", false, true],
+          ["talent-showdown", "Talent Showdown", "🎤", "3–10 players", false, true],
+          ["team-trivia", "Team Trivia Night", "🏆", "4–12 players", false, true],
+          ["guess-the-doodle", "Guess the Doodle", "✍️", "2–8 players", false, true],
+          ["mystery-sound", "Mystery Sound", "🔉", "2–8 players", false, true],
+          ["secret-agent", "Secret Agent", "🕶", "4–10 players", false, true],
+          ["team-charades", "Team Charades", "🎭", "4–12 players", false, true],
+          ["friendly-feud", "Friendly Feud", "🤝", "4–12 players", false, true]
+        ].map(([id, name, icon, players, solo, multi]) => ({ category: "Party", id, name, icon, players, solo, multi })),
+        ...[
+          ["paddle-ball", "Paddle Ball", "🏓", "1 player", true, false],
+          ["neon-drift", "Neon Drift", "🏎", "1 player", true, false],
+          ["rocket-hop", "Rocket Hop", "🚀", "1 player", true, false],
+          ["tiny-fisher", "Tiny Fisher", "🎣", "1 player", true, false],
+          ["cloud-jumper", "Cloud Jumper", "☁", "1 player", true, false],
+          ["pinball", "Pinball", "🎯", "1 player", true, false],
+          ["laser-maze", "Laser Maze", "🔦", "1 player", true, false],
+          ["rolling-ball", "Rolling Ball", "🔵", "1 player", true, false],
+          ["candy-match", "Candy Match", "🍬", "1 player", true, false],
+          ["drum-tap", "Drum Tap", "🥁", "1 player", true, false],
+          ["bubble-flight", "Bubble Flight", "🫧", "1 player", true, false],
+          ["robot-run", "Robot Run", "🤖", "1 player", true, false],
+          ["meteor-dodge", "Meteor Dodge", "☄", "1 player", true, false],
+          ["magnet-mania", "Magnet Mania", "🧲", "1 player", true, false],
+          ["pocket-racer", "Pocket Racer", "🏁", "1 player", true, false]
+        ].map(([id, name, icon, players, solo, multi]) => ({ category: "Arcade", id, name, icon, players, solo, multi })),
+        ...[
+          ["kenken", "KenKen", "🔢", "1 player", true, false],
+          ["kakuro", "Kakuro", "➕", "1 player", true, false],
+          ["wordoku", "Wordoku", "🔤", "1 player", true, false],
+          ["tangram", "Tangram", "🔺", "1 player", true, false],
+          ["bridge-builder", "Bridge Builder Puzzle", "🌉", "1 player", true, false],
+          ["matchstick-math", "Matchstick Math", "🔥", "1 player", true, false],
+          ["river-crossing", "River Crossing", "🚣", "1 player", true, false],
+          ["sliding-colors", "Sliding Colors", "🟦", "1 player", true, false],
+          ["cryptogram", "Cryptogram", "🔐", "1 player", true, false],
+          ["spot-difference", "Spot the Difference", "👀", "1 player", true, false],
+          ["shape-sequence", "Shape Sequence", "🔶", "1 player", true, false],
+          ["math-cross", "Math Cross", "✖️", "1 player", true, false],
+          ["color-nonogram", "Color Nonogram", "🎨", "1 player", true, false],
+          ["laser-logic", "Laser Logic", "🔦", "1 player", true, false],
+          ["island-bridges", "Island Bridges", "🏝", "1 player", true, false]
+        ].map(([id, name, icon, players, solo, multi]) => ({ category: "Strategy & Puzzle", id, name, icon, players, solo, multi }))
+      ];
+      const setupModal = document.querySelector("#setup-modal");
+      const setupForm = document.querySelector("#setup-form");
+      const launchModal = document.querySelector("#launch-modal");
+      const launchModes = document.querySelector("#launch-modes");
+      const profileKey = "playroom-demo-profile-v1";
+      const birthdayQuotes = [
+        "May the year ahead bring fresh ideas, kind friends, and many reasons to smile.",
+        "A new year of you begins today. Make room for the things that make you feel most alive.",
+        "Wishing you a day full of warmth, laughter, and little moments worth remembering.",
+        "May your next trip around the sun be bright with curiosity and good surprises."
+      ];
+      let profile = null;
+
+      try { profile = JSON.parse(localStorage.getItem(profileKey) || "null"); } catch { profile = null; }
+
+      function showBirthdayWish() {
+        const birthday = profile?.birthday;
+        if (!birthday) return;
+        const now = new Date();
+        const today = `${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+        if (birthday !== today) return;
+        const quote = birthdayQuotes[(now.getDate() + now.getMonth()) % birthdayQuotes.length];
+        document.querySelector("#birthday-title").textContent = `Happy birthday, ${profile.name}!`;
+        document.querySelector("#birthday-quote").textContent = quote;
+        document.querySelector("#birthday-banner").hidden = false;
+      }
+
+      function applyProfile() {
+        if (!profile) return;
+        document.querySelector("#profile-name").textContent = profile.name;
+        document.querySelector("#profile-toggle").setAttribute("aria-label", `${profile.name} profile`);
+        document.querySelector("#post-input").placeholder = `What are you playing today, ${profile.name}?`;
+        document.querySelectorAll(".composer-avatar").forEach((avatar) => { avatar.setAttribute("aria-label", profile.name); });
+        showBirthdayWish();
+      }
+
+      function calculateAge(dateString) {
+        const birth = new Date(`${dateString}T00:00:00`);
+        const now = new Date();
+        let age = now.getFullYear() - birth.getFullYear();
+        if (now.getMonth() < birth.getMonth() || (now.getMonth() === birth.getMonth() && now.getDate() < birth.getDate())) age -= 1;
+        return Number.isFinite(age) ? age : -1;
+      }
+
+      setupForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const name = document.querySelector("#signup-name").value.trim();
+        const dob = document.querySelector("#signup-dob").value;
+        const age = calculateAge(dob);
+        const error = document.querySelector("#setup-error");
+        if (!name || !dob || age < 13) {
+          error.textContent = "You must be at least 13 and enter a valid date of birth to continue.";
+          return;
+        }
+        const birthDate = new Date(`${dob}T00:00:00`);
+        profile = {
+          name,
+          gender: document.querySelector("#signup-gender").value,
+          ageBand: age >= 18 ? "adult" : "teen",
+          birthday: document.querySelector("#birthday-optin").checked ? `${String(birthDate.getMonth() + 1).padStart(2, "0")}-${String(birthDate.getDate()).padStart(2, "0")}` : null
+        };
+        localStorage.setItem(profileKey, JSON.stringify(profile));
+        applyProfile();
+        setupModal.classList.remove("open");
+      });
+
+      if (profile?.name && ["teen", "adult"].includes(profile.ageBand)) applyProfile();
+      else {
+        profile = null;
+        setupModal.classList.add("open");
+        document.querySelector("#signup-name").focus();
+      }
+
+      const gameGroups = document.querySelector("#catalog-groups");
+      const groupedGames = Map.groupBy ? Map.groupBy(games, (game) => game.category) : games.reduce((groups, game) => {
+        groups.set(game.category, [...(groups.get(game.category) || []), game]);
+        return groups;
+      }, new Map());
+      for (const [category, categoryGames] of groupedGames) {
+        const section = document.createElement("section");
+        section.className = "catalog-group";
+        const heading = document.createElement("h2");
+        heading.textContent = category;
+        const grid = document.createElement("div");
+        grid.className = "catalog-grid";
+        for (const game of categoryGames) {
+          const card = document.createElement("button");
+          card.type = "button";
+          card.className = "catalog-game";
+          card.dataset.gameId = game.id;
+          card.setAttribute("aria-label", `${game.name}, ${game.players}${game.playable ? ", playable now" : ", catalog preview"}`);
+          const logo = document.createElement("span");
+          logo.className = "catalog-logo";
+          logo.textContent = game.icon;
+          const copy = document.createElement("span");
+          copy.className = "catalog-game-copy";
+          const name = document.createElement("b");
+          name.textContent = game.name;
+          const players = document.createElement("small");
+          players.textContent = game.players;
+          copy.append(name, players);
+          const status = document.createElement("span");
+          status.className = `catalog-status${game.playable ? "" : " preview"}`;
+          status.textContent = game.playable ? "PLAY" : "SOON";
+          card.append(logo, copy, status);
+          card.addEventListener("click", () => openGameOptions(game));
+          grid.append(card);
+        }
+        section.append(heading, grid);
+        gameGroups.append(section);
+      }
+
+      function addModeButton(title, description, action, disabled = false) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "launch-mode";
+        button.disabled = disabled;
+        const copy = document.createElement("span");
+        const heading = document.createElement("b");
+        heading.textContent = title;
+        const detail = document.createElement("small");
+        detail.textContent = description;
+        copy.append(heading, detail);
+        const arrow = document.createElement("span");
+        arrow.textContent = disabled ? "Soon" : "›";
+        button.append(copy, arrow);
+        if (action) button.addEventListener("click", action);
+        launchModes.append(button);
+      }
+
+      function openTicTacToe(modeName) {
+        launchModal.classList.remove("open");
+        const gameModal = document.querySelector("#game-modal");
+        gameModal.classList.add("open");
+        const modeButton = document.querySelector(`[data-mode="${modeName}"]`);
+        if (modeButton) modeButton.click();
+        else document.querySelector("#new-game").click();
+      }
+
+      function openGameOptions(game) {
+        document.querySelector("#launch-game-logo").textContent = game.icon;
+        document.querySelector("#launch-game-name").textContent = game.name;
+        document.querySelector("#launch-game-summary").textContent = `${game.players} · ${game.solo && game.multi ? "Solo or multiplayer" : game.solo ? "Solo game" : "Multiplayer game"}`;
+        document.querySelector("#launch-game-note").textContent = game.playable ? "Choose how you want to play." : "This title is in the catalog. Its playable version is planned for a later build.";
+        launchModes.replaceChildren();
+
+        if (game.solo) {
+          addModeButton("Play solo", game.playable ? "Play against the bot on this device." : "Solo mode · catalog preview", game.playable ? () => openTicTacToe("bot") : () => notify(`${game.name} is listed in the catalog but is not playable in this demo yet.`));
+        }
+        if (game.multi) {
+          if (game.playable) addModeButton("Pass & play", "Two players share this device.", () => openTicTacToe("local"));
+          const teenAccount = profile?.ageBand !== "adult";
+          const matchTitle = teenAccount ? "Invite a friend" : profile?.gender === "boy" ? "Match with adult women (18+)" : profile?.gender === "girl" ? "Match with adult men (18+)" : "Match with adults (18+)";
+          const matchDescription = teenAccount ? "Teen accounts can play with friends; no random stranger matching." : "Age-matched matchmaking · game invites are a demo here.";
+          addModeButton(matchTitle, matchDescription, () => {
+            const note = teenAccount ? "Teen multiplayer is friend-invite only. Connect a real server to send the invite." : "This demo does not connect to live matchmaking. Real matches must verify age and apply this adult-only preference on the server.";
+            notify(note);
+          });
+        }
+        launchModal.classList.add("open");
+        launchModal.querySelector("[data-close-launch]").focus();
+      }
+
+      document.querySelectorAll("[data-close-launch]").forEach((button) => button.addEventListener("click", () => launchModal.classList.remove("open")));
+      launchModal.addEventListener("click", (event) => { if (event.target === launchModal) launchModal.classList.remove("open"); });
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && launchModal.classList.contains("open")) launchModal.classList.remove("open");
+      });
+      document.querySelectorAll(".mini-game[data-open-game]").forEach((button) => button.addEventListener("click", (event) => {
+        event.stopImmediatePropagation();
+        openGameOptions(games[0]);
+      }, true));
+
+      const search = document.querySelector("#game-search");
+      search.addEventListener("input", () => {
+        const query = search.value.trim().toLowerCase();
+        document.querySelectorAll(".catalog-game").forEach((card) => { card.hidden = !card.innerText.toLowerCase().includes(query); });
+      });
+    })();
+  </script>
+  <script>
+    (() => {
+      const friends = [
+        { id: "ananya", name: "Ananya Rao", avatar: "👩🏻‍🎤", style: "", status: "Online · Exploring games", bio: "Music, strategy games, and weekend Ludo." },
+        { id: "kabir", name: "Kabir Singh", avatar: "👨🏾‍🚀", style: "orange", status: "Online · Just finished a match", bio: "Always up for a quick match with friends." },
+        { id: "diya", name: "Diya Patel", avatar: "🧑🏻‍🎨", style: "blue", status: "Online · Available to play", bio: "Drawing, quizzes, and friendly competition." }
+      ];
+      const threadKey = "playroom-demo-chats-v1";
+      const directory = document.querySelector("#friends-directory");
+      const friendsGrid = document.querySelector("#friends-grid");
+      const chatLayout = document.querySelector("#chat-layout");
+      const chatList = document.querySelector("#chat-list-body");
+      const chatMessages = document.querySelector("#chat-messages");
+      const profileModal = document.querySelector("#friend-profile-modal");
+      let threads = {};
+      let activeFriend = null;
+      let viewedFriend = null;
+
+      try { threads = JSON.parse(localStorage.getItem(threadKey) || "{}"); } catch { threads = {}; }
+      if (!threads || typeof threads !== "object" || Array.isArray(threads)) threads = {};
+
+      function saveThreads() {
+        localStorage.setItem(threadKey, JSON.stringify(threads));
+      }
+
+      function threadFor(friendId) {
+        if (!Array.isArray(threads[friendId])) threads[friendId] = [];
+        return threads[friendId];
+      }
+
+      function createFriendCard(friend) {
+        const card = document.createElement("button");
+        card.type = "button";
+        card.className = "friend-card";
+        card.dataset.friendId = friend.id;
+        const avatar = document.createElement("span");
+        avatar.className = `friend-card-avatar ${friend.style}`.trim();
+        avatar.textContent = friend.avatar;
+        const name = document.createElement("b");
+        name.textContent = friend.name;
+        const status = document.createElement("small");
+        status.textContent = friend.status;
+        card.append(avatar, name, status);
+        card.addEventListener("click", () => openFriendProfile(friend));
+        return card;
+      }
+
+      friends.forEach((friend) => friendsGrid.append(createFriendCard(friend)));
+
+      function setTab(tab) {
+        document.querySelector("#friends-tab-all").classList.toggle("selected", tab === "all");
+        document.querySelector("#friends-tab-chats").classList.toggle("selected", tab === "chats");
+        if (tab === "all") showDirectory();
+        else if (Object.keys(threads).some((id) => Array.isArray(threads[id]) && threads[id].length)) {
+          const first = Object.keys(threads).find((id) => Array.isArray(threads[id]) && threads[id].length);
+          openChat(first);
+        } else {
+          directory.hidden = false;
+          chatLayout.hidden = true;
+          document.querySelector("#no-friends-empty").hidden = false;
+          document.querySelector("#no-friends-empty").textContent = "No conversations yet. Select a friend to view their profile and send the first message.";
+          friendsGrid.hidden = true;
+        }
+      }
+
+      function showDirectory() {
+        activeFriend = null;
+        directory.hidden = false;
+        chatLayout.hidden = true;
+        document.querySelector("#no-friends-empty").hidden = true;
+        friendsGrid.hidden = false;
+        document.querySelector("#friends-subtitle").textContent = "Select a profile to see details or send a message.";
+        document.querySelector("#friends-back").hidden = true;
+        document.querySelector("#friends-tab-all").classList.add("selected");
+        document.querySelector("#friends-tab-chats").classList.remove("selected");
+      }
+
+      function renderChatList() {
+        chatList.replaceChildren();
+        const chatIds = Object.keys(threads).filter((id) => Array.isArray(threads[id]) && threads[id].length);
+        chatIds.sort((left, right) => (threads[right].at(-1)?.at || 0) - (threads[left].at(-1)?.at || 0));
+        document.querySelector("#chat-count").textContent = chatIds.length ? `(${chatIds.length})` : "";
+        for (const id of chatIds) {
+          const friend = friends.find((item) => item.id === id);
+          if (!friend) continue;
+          const lastMessage = threads[id].at(-1);
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = `chat-person${activeFriend?.id === id ? " selected" : ""}`;
+          const avatar = document.createElement("span");
+          avatar.className = "chat-person-avatar";
+          avatar.textContent = friend.avatar;
+          const copy = document.createElement("span");
+          copy.className = "chat-person-copy";
+          const name = document.createElement("b");
+          name.textContent = friend.name;
+          const preview = document.createElement("small");
+          preview.textContent = lastMessage.text;
+          copy.append(name, preview);
+          button.append(avatar, copy);
+          button.addEventListener("click", () => openChat(id));
+          chatList.append(button);
+        }
+      }
+
+      function renderMessages(friend) {
+        chatMessages.replaceChildren();
+        const messages = threadFor(friend.id);
+        if (!messages.length) {
+          const empty = document.createElement("p");
+          empty.className = "friends-empty";
+          empty.textContent = `Start a conversation with ${friend.name}.`;
+          chatMessages.append(empty);
+          return;
+        }
+        for (const message of messages) {
+          const bubble = document.createElement("div");
+          bubble.className = `chat-bubble${message.mine ? " mine" : ""}`;
+          const text = document.createElement("div");
+          text.textContent = message.text;
+          const time = document.createElement("div");
+          time.className = "chat-time";
+          time.textContent = new Date(message.at).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+          bubble.append(text, time);
+          chatMessages.append(bubble);
+        }
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+
+      function openChat(friendId) {
+        const friend = friends.find((item) => item.id === friendId);
+        if (!friend) return showDirectory();
+        activeFriend = friend;
+        directory.hidden = true;
+        chatLayout.hidden = false;
+        document.querySelector("#friends-subtitle").textContent = `Conversation with ${friend.name}`;
+        document.querySelector("#friends-back").hidden = false;
+        document.querySelector("#thread-avatar").textContent = friend.avatar;
+        document.querySelector("#thread-name").textContent = friend.name;
+        document.querySelector("#thread-status").textContent = friend.status;
+        renderMessages(friend);
+        renderChatList();
+        document.querySelector("#chat-input").focus();
+      }
+
+      function openFriendProfile(friend) {
+        viewedFriend = friend;
+        document.querySelector("#friend-profile-avatar").textContent = friend.avatar;
+        document.querySelector("#friend-profile-avatar").className = `profile-dialog-avatar ${friend.style}`.trim();
+        document.querySelector("#friend-profile-name").textContent = friend.name;
+        document.querySelector("#friend-profile-status").textContent = `${friend.status} · ${friend.bio}`;
+        profileModal.classList.add("open");
+        document.querySelector("#friend-profile-message").focus();
+      }
+
+      function openFriendsScreen() {
+        const existing = Object.keys(threads).filter((id) => Array.isArray(threads[id]) && threads[id].length);
+        if (!existing.length) {
+          showDirectory();
+          return;
+        }
+        existing.sort((left, right) => (threads[right].at(-1)?.at || 0) - (threads[left].at(-1)?.at || 0));
+        openChat(existing[0]);
+      }
+
+      document.addEventListener("friends-open", openFriendsScreen);
+      document.querySelector("#friends-tab-all").addEventListener("click", showDirectory);
+      document.querySelector("#friends-tab-chats").addEventListener("click", () => setTab("chats"));
+      document.querySelector("#friends-back").addEventListener("click", showDirectory);
+      document.querySelector("#chat-all-friends").addEventListener("click", showDirectory);
+      document.querySelector("#thread-profile").addEventListener("click", () => { if (activeFriend) openFriendProfile(activeFriend); });
+      document.querySelector("#friend-profile-message").addEventListener("click", () => {
+        if (!viewedFriend) return;
+        profileModal.classList.remove("open");
+        openChat(viewedFriend.id);
+      });
+      document.querySelectorAll("[data-close-friend-profile]").forEach((button) => button.addEventListener("click", () => profileModal.classList.remove("open")));
+      profileModal.addEventListener("click", (event) => { if (event.target === profileModal) profileModal.classList.remove("open"); });
+      document.addEventListener("keydown", (event) => { if (event.key === "Escape") profileModal.classList.remove("open"); });
+
+      document.querySelector("#chat-compose").addEventListener("submit", (event) => {
+        event.preventDefault();
+        if (!activeFriend) return;
+        const input = document.querySelector("#chat-input");
+        const text = input.value.trim();
+        if (!text) return;
+        threadFor(activeFriend.id).push({ text, mine: true, at: Date.now() });
+        saveThreads();
+        renderMessages(activeFriend);
+        renderChatList();
+        input.value = "";
+      });
+    })();
+  </script>
+</body>
+</html>
