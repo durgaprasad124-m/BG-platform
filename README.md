@@ -1,4 +1,4 @@
-# Playroom UI Prototype
+# BG-platform
 
 A responsive social gaming front-end prototype for desktop and mobile. It has a social feed, friend stories, a 205-title categorized game catalog, browser-local friend conversations, sample posts, local post/like/comment interactions, friend/game previews, a daily reward, and playable Tic-Tac-Toe against a bot or in pass-and-play mode.
 
