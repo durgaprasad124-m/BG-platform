@@ -1,11 +1,11 @@
 {
   "name": "bg-platform",
   "version": "1.0.0",
-  "description": "A responsive social gaming front-end prototype for desktop and mobile. It has a social feed, friend stories, a 205-title categorized game catalog, browser-local friend conversations, sample posts, local post/like/comment interactions, friend/game previews, a daily reward, and playable Tic-Tac-Toe against a bot or in pass-and-play mode.",
+  "description": "A production-ready social gaming platform with verified accounts, MongoDB persistence, social feeds, private messaging, and server-authoritative Tic-Tac-Toe.",
   "main": "index.js",
   "scripts": {
     "start": "node serve.mjs",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --test"
   },
   "repository": {
     "type": "git",
@@ -14,7 +14,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "bugs": {
     "url": "https://github.com/durgaprasad124-m/BG-platform/issues"
   },
@@ -23,6 +23,7 @@
     "dotenv": "^18.0.5",
     "express": "^5.2.1",
     "intl-tel-input": "^29.5.3",
+    "mongodb": "^7.7.0",
     "nodemailer": "^10.0.14"
   }
 }
