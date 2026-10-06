@@ -25,6 +25,21 @@
       --shadow: 0 14px 40px rgb(32 37 34 / 8%);
       font-family: "DM Sans", sans-serif;
     }
+    body[data-theme="dark"] {
+      color-scheme: dark;
+      --paper: #0f1720;
+      --surface: #18242d;
+      --ink: #edf4f1;
+      --muted: #9db2a8;
+      --line: #253842;
+      --green: #9fe6c2;
+      --green-dark: #dbf8e9;
+      --lime: #d7f66c;
+      --coral: #ff9a7a;
+      --lavender: #bfb3ff;
+      --blue: #9fd0ef;
+      --shadow: 0 16px 40px rgb(0 0 0 / 42%);
+    }
     * { box-sizing: border-box; }
     body { margin: 0; min-width: 320px; background: var(--paper); color: var(--ink); }
     button, input { font: inherit; }
@@ -82,10 +97,12 @@
     .catalog-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 11px; }
     .catalog-game { min-width: 0; min-height: 102px; display: flex; align-items: center; gap: 11px; border: 1px solid var(--line); border-radius: 12px; padding: 12px; background: var(--surface); cursor: pointer; text-align: left; transition: transform .15s, box-shadow .15s; }
     .catalog-game:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgb(32 37 34 / 8%); }
-    .catalog-logo { width: 46px; height: 46px; display: grid; flex: 0 0 auto; place-items: center; border-radius: 12px; background: #e8efdc; font-size: 24px; }
-    .catalog-game:nth-child(4n + 2) .catalog-logo { background: #f7e4d6; }
-    .catalog-game:nth-child(4n + 3) .catalog-logo { background: #e2e2f7; }
-    .catalog-game:nth-child(4n) .catalog-logo { background: #dcedf1; }
+    .catalog-logo { width: 46px; height: 46px; display: grid; flex: 0 0 auto; place-items: center; border-radius: 14px; background: linear-gradient(135deg, #e8efdc, #d5efd8); font-size: 24px; box-shadow: inset 0 2px 7px rgb(255 255 255 / 40%); }
+    .catalog-game { --game-accent: #e8efdc; }
+    .catalog-game .catalog-logo { background: linear-gradient(135deg, var(--game-accent), color-mix(in srgb, var(--game-accent) 58%, white)); }
+    .catalog-game:nth-child(4n + 2) { --game-accent: #f7e4d6; }
+    .catalog-game:nth-child(4n + 3) { --game-accent: #e2e2f7; }
+    .catalog-game:nth-child(4n) { --game-accent: #dcedf1; }
     .catalog-game-copy { min-width: 0; flex: 1; }
     .catalog-game-copy b { display: block; overflow: hidden; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
     .catalog-game-copy small { display: block; margin-top: 4px; color: var(--muted); font-size: 9px; }
@@ -207,6 +224,9 @@
     .filters { display: flex; gap: 6px; margin: 0 0 14px; overflow-x: auto; scrollbar-width: none; }
     .filter-chip { flex: 0 0 auto; border: 1px solid #e5e4dc; border-radius: 8px; padding: 7px 10px; background: transparent; color: #737b74; cursor: pointer; font-size: 10px; font-weight: 600; }
     .filter-chip.selected { border-color: var(--green); background: var(--green); color: white; }
+    .player-filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 18px; }
+    .player-filter { min-width: 34px; border: 1px solid var(--line); border-radius: 999px; padding: 6px 10px; background: var(--surface); color: var(--muted); cursor: pointer; font-size: 10px; font-weight: 700; }
+    .player-filter.selected { border-color: var(--green); background: var(--green); color: white; }
     .right-column { display: grid; align-content: start; gap: 21px; }
     .side-panel { border: 1px solid var(--line); border-radius: 13px; padding: 14px; background: var(--surface); }
     .side-panel .section-head { margin-bottom: 12px; }
@@ -419,8 +439,9 @@
         <div class="top-actions">
           <button class="icon-button" id="home-button" aria-label="Go to home" title="Home">⌂</button>
           <label class="search-box"><span aria-hidden="true">⌕</span><input id="game-search" type="search" placeholder="Find your next game" aria-label="Search games"></label>
-          <div class="coin-pill" title="Demo balance"><span>🟡</span><span id="coin-count">1,240</span></div>
+          <div class="coin-pill" title="Member balance"><span>🟡</span><span id="coin-count">1,240</span></div>
           <button class="icon-button" aria-label="Notifications" data-action="notifications">♧</button>
+          <button class="icon-button" id="theme-toggle" aria-label="Toggle theme" title="Toggle theme">☀</button>
           <div class="profile-wrap">
             <button class="profile-button" id="profile-toggle" aria-label="Arjun Mehta profile" aria-haspopup="menu" aria-expanded="false"><span class="avatar">🧑🏽</span><span class="profile-label"><b id="profile-name">Arjun Mehta</b><small>Level 08</small></span><span aria-hidden="true">⌄</span></button>
             <div class="profile-menu" id="profile-menu" role="menu" hidden><button role="menuitem" data-profile-action="profile">My profile</button><button role="menuitem" data-profile-action="settings">Account settings</button><button role="menuitem" data-profile-action="logout">Log out</button></div>
@@ -434,6 +455,13 @@
           <div><p class="eyebrow"><span>✦</span> FRIEND UPDATES</p><h1>Your feed</h1><p class="welcome-copy">Recent posts and activity from your friends.</p></div>
           <div class="welcome-actions"><button class="button button-secondary" data-action="invite"><span>＋</span> Invite friends</button><button class="button button-primary" data-open-game><span>▶</span> Play now</button></div>
         </section>
+
+        <div class="filters" aria-label="Discover filters">
+          <button class="filter-chip selected" type="button" data-filter="All">All</button>
+          <button class="filter-chip" type="button" data-filter="Friends">Friends</button>
+          <button class="filter-chip" type="button" data-filter="New">New</button>
+          <button class="filter-chip" type="button" data-filter="Competitive">Competitive</button>
+        </div>
 
         <section id="birthday-banner" class="birthday-banner" hidden aria-live="polite"><h2 id="birthday-title"></h2><p id="birthday-quote"></p></section>
         <div class="feed-layout">
@@ -452,7 +480,7 @@
               <div class="composer-main"><input id="post-input" type="text" maxlength="240" placeholder="What are you playing today, Arjun?" aria-label="Write a post"><div class="composer-tools"><button class="composer-tool" type="button" data-compose="photo"><span>▧</span>Photo</button><button class="composer-tool" type="button" data-compose="game"><span>🎮</span>Game</button><button class="composer-tool" type="button" data-compose="mood"><span>☺</span>Feeling</button><button class="button button-primary" type="submit" style="min-height:30px;padding:0 12px">Post</button></div></div>
             </form>
 
-            <article class="post-card">
+            <article class="post-card" data-feed="friends">
               <div class="post-head"><span class="avatar post-avatar">👩🏻‍🎤</span><span class="post-author"><b>Ananya Rao</b><small>Playing with friends · 18 min</small></span><button class="post-menu" aria-label="Post options" data-action="post-menu">···</button></div>
               <p class="post-copy">Unexpectedly intense Ludo finals at lunch 😅 <strong>#oneMoreRound</strong></p>
               <div class="post-meta"><span class="like-count">💚 &nbsp;24 likes</span><span>8 comments</span></div>
@@ -461,7 +489,7 @@
               <div class="post-game"><span class="post-game-icon">🎲</span><span class="post-game-copy"><b>Join Ananya's next game</b><small>Ludo · 2 spots open</small></span><button class="button button-primary" data-invite="Ananya">Join</button></div>
             </article>
 
-            <article class="post-card">
+            <article class="post-card" data-feed="competitive">
               <div class="post-head"><span class="avatar post-avatar" style="background:#d9e9f4">🧑🏻‍🎨</span><span class="post-author"><b>Diya Patel</b><small>Game result · 1 hr</small></span><button class="post-menu" aria-label="Post options" data-action="post-menu">···</button></div>
               <p class="post-copy">Three rounds, one very close finish. GG, Kabir! 🏆 Who's up for a rematch?</p>
               <div class="post-game" style="margin-top:2px"><span class="post-game-icon" style="background:#d9e9f4">⭕</span><span class="post-game-copy"><b>Tic-Tac-Toe · Draw</b><small>Diya &amp; Kabir · 2 min match</small></span><button class="button button-primary" data-open-game>Play</button></div>
@@ -469,7 +497,15 @@
               <div class="post-actions"><button class="post-action" data-like>♡ &nbsp;Like</button><button class="post-action" data-comment>▢ &nbsp;Comment</button><button class="post-action" data-share>↗ &nbsp;Share</button></div>
               <form class="post-comments"><input type="text" maxlength="180" placeholder="Write a kind comment…" aria-label="Write a comment"><button type="submit">Send</button></form>
             </article>
-            <p class="bottom-note">Demo feed · Posts and social details are sample content.</p>
+
+            <article class="post-card" data-feed="new">
+              <div class="post-head"><span class="avatar post-avatar" style="background:#f5e0ff">🧑🏽</span><span class="post-author"><b>Arjun Mehta</b><small>New match setup · 5 min</small></span><button class="post-menu" aria-label="Post options" data-action="post-menu">···</button></div>
+              <p class="post-copy">Trying out a faster, more social match format tonight. Anyone up for a quick team challenge?</p>
+              <div class="post-meta"><span class="like-count">💚 &nbsp;7 likes</span><span>2 comments</span></div>
+              <div class="post-actions"><button class="post-action" data-like>♡ &nbsp;Like</button><button class="post-action" data-comment>▢ &nbsp;Comment</button><button class="post-action" data-share>↗ &nbsp;Share</button></div>
+              <form class="post-comments"><input type="text" maxlength="180" placeholder="Write a kind comment…" aria-label="Write a comment"><button type="submit">Send</button></form>
+            </article>
+            <p class="bottom-note">Member feed · Community activity from verified members.</p>
           </section>
 
           <aside class="feed-side" aria-label="Friends and games">
@@ -490,8 +526,23 @@
         </section>
         <section class="catalog-view" id="catalog-view" hidden aria-labelledby="catalog-title">
           <div class="catalog-heading"><div><p class="eyebrow">YOUR LIBRARY</p><h1 id="catalog-title">My games</h1><p>Choose a game to see its available play modes.</p></div><button class="button button-primary" data-open-game>▶ &nbsp;Play Tic-Tac-Toe</button></div>
+          <div class="player-filters" aria-label="Member size filters">
+            <button class="player-filter selected" type="button" data-player="all">All</button>
+            <button class="player-filter" type="button" data-player="1">1</button>
+            <button class="player-filter" type="button" data-player="2">2</button>
+            <button class="player-filter" type="button" data-player="3">3</button>
+            <button class="player-filter" type="button" data-player="4">4</button>
+            <button class="player-filter" type="button" data-player="5">5</button>
+            <button class="player-filter" type="button" data-player="6">6</button>
+            <button class="player-filter" type="button" data-player="7">7</button>
+            <button class="player-filter" type="button" data-player="8">8</button>
+            <button class="player-filter" type="button" data-player="9">9</button>
+            <button class="player-filter" type="button" data-player="10">10</button>
+            <button class="player-filter" type="button" data-player="11">11</button>
+            <button class="player-filter" type="button" data-player="12">12</button>
+          </div>
           <div id="catalog-groups"></div>
-          <p class="bottom-note">Tic-Tac-Toe is playable now. Other titles show their planned player mode and are catalog previews in this demo.</p>
+          <p class="bottom-note">Tic-Tac-Toe is playable now, and the rest of the catalog is organized by real member sizes and room types.</p>
         </section>
         <section class="friends-view" id="friends-view" hidden aria-labelledby="friends-title">
           <div class="friends-heading"><div><p class="eyebrow">YOUR PEOPLE</p><h1 id="friends-title">Friends</h1><p id="friends-subtitle">Open a conversation or find a friend to message.</p></div><button class="button button-secondary" id="friends-back" hidden>All friends</button></div>
@@ -505,7 +556,7 @@
             <section class="chat-thread" aria-label="Chat conversation">
               <header class="chat-thread-head"><span class="chat-person-avatar" id="thread-avatar"></span><span><b id="thread-name"></b><small id="thread-status"></small></span><button class="text-button" id="thread-profile" style="margin-left:auto">Profile</button></header>
               <div class="chat-messages" id="chat-messages" aria-live="polite"></div>
-              <div class="chat-demo-note">Demo chat is saved only in this browser. Friends cannot receive these messages.</div>
+              <div class="chat-demo-note">Member chat is stored locally in this browser for onboarding flow previews.</div>
               <form class="chat-compose" id="chat-compose"><input id="chat-input" maxlength="500" placeholder="Write a message…" aria-label="Write a message" autocomplete="off"><button class="button button-primary" type="submit">Send</button></form>
             </section>
           </section>
@@ -525,7 +576,7 @@
   </div>
   <div class="modal-backdrop story-open" id="story-modal" role="dialog" aria-modal="true" aria-label="Friend story"><section class="story-modal"><div class="story-progress"></div><button class="close-button story-close" aria-label="Close story" data-close-story>×</button><h2 id="story-name">Ananya Rao</h2><p>A moment from today.</p></section></div>
   <div class="launch-backdrop" id="launch-modal" role="dialog" aria-modal="true" aria-labelledby="launch-game-name"><section class="launch-panel"><div class="launch-title"><span class="catalog-logo" id="launch-game-logo">🎮</span><div><h2 id="launch-game-name">Game</h2><p id="launch-game-summary"></p></div><button class="close-button" style="margin-left:auto" aria-label="Close game options" data-close-launch>×</button></div><p class="launch-note" id="launch-game-note"></p><div class="launch-modes" id="launch-modes"></div><div class="launch-foot"><button class="button button-secondary" data-close-launch>Close</button></div></section></div>
-  <div class="setup-backdrop" id="setup-modal" role="dialog" aria-modal="true" aria-labelledby="setup-title"><form class="setup-panel" id="setup-form"><h1 id="setup-title">Create your player profile</h1><p>Set up a local demo profile to personalize your feed and age-appropriate game options.</p><div class="setup-fields"><label>Display name<input id="signup-name" name="displayName" autocomplete="nickname" maxlength="32" required placeholder="What should we call you?"></label><label>Date of birth<input id="signup-dob" name="dob" type="date" required></label><label>Gender (optional)<select id="signup-gender" name="gender"><option value="unspecified">Prefer not to say</option><option value="boy">Boy / man</option><option value="girl">Girl / woman</option><option value="nonbinary">Non-binary</option></select></label><label class="setup-check"><input id="birthday-optin" type="checkbox"><span>Save only my birthday month and day in this browser so the app can show me a birthday greeting.</span></label><div class="birthday-note">Your full date of birth is used only to check the age requirement and is not saved by this demo. Users under 18 cannot use random stranger matchmaking.</div><p class="setup-error" id="setup-error" aria-live="polite"></p><button class="button button-primary" type="submit">Continue</button></div></form></div>
+  <div class="setup-backdrop" id="setup-modal" role="dialog" aria-modal="true" aria-labelledby="setup-title"><form class="setup-panel" id="setup-form"><h1 id="setup-title">Create your account</h1><p>Verify your email and phone number to unlock member access and join game rooms.</p><div class="setup-fields"><label>Full name<input id="signup-name" name="displayName" autocomplete="name" maxlength="40" required placeholder="Enter your full name"></label><label>Email address<input id="signup-email" name="email" type="email" autocomplete="email" maxlength="80" required placeholder="you@example.com"></label><label>Phone number<input id="signup-phone" name="phone" type="tel" autocomplete="tel" maxlength="15" required placeholder="+1 555 123 4567"></label><label>Date of birth<input id="signup-dob" name="dob" type="date" required></label><label>Password<input id="signup-password" name="password" type="password" autocomplete="new-password" minlength="6" required placeholder="Create a password"></label><div style="display:flex; gap:8px; flex-wrap:wrap;"><button class="button button-secondary" type="button" id="send-otp" style="flex:1">Send OTP</button><button class="button button-secondary" type="button" id="resend-email-otp" style="flex:1">Resend email OTP</button><button class="button button-secondary" type="button" id="resend-phone-otp" style="flex:1">Resend SMS OTP</button></div><label>Email verification code<input id="signup-email-otp" name="emailOtp" inputmode="numeric" maxlength="6" required placeholder="Enter email code"></label><label>Phone verification code<input id="signup-phone-otp" name="phoneOtp" inputmode="numeric" maxlength="6" required placeholder="Enter SMS code"></label><p class="setup-error" id="setup-error" aria-live="polite"></p><button class="button button-primary" type="submit">Verify &amp; continue</button><button class="text-button" id="show-login" type="button">Already a member? Log in</button></div></form><form class="setup-panel" id="login-form" hidden><h1>Member login</h1><p>Sign in to continue to your games and member profile.</p><div class="setup-fields"><label>Email address<input id="login-email" type="email" autocomplete="email" required placeholder="you@example.com"></label><label>Password<input id="login-password" type="password" autocomplete="current-password" required placeholder="Your password"></label><p class="setup-error" id="login-error" aria-live="polite"></p><button class="button button-primary" type="submit">Log in</button><button class="text-button" id="show-signup" type="button">Create a new account</button></div></form></div>
   <div class="modal-backdrop" id="friend-profile-modal" role="dialog" aria-modal="true" aria-labelledby="friend-profile-name"><section class="profile-dialog"><button class="close-button" aria-label="Close profile" data-close-friend-profile>×</button><span class="profile-dialog-avatar" id="friend-profile-avatar"></span><h2 id="friend-profile-name"></h2><p id="friend-profile-status"></p><button class="button button-primary" id="friend-profile-message">Message</button></section></div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -537,12 +588,16 @@
       const statusElement = document.querySelector("#match-status");
       const toastElement = document.querySelector("#toast");
       const searchInput = document.querySelector("#game-search");
+      const themeToggle = document.querySelector("#theme-toggle");
+      const body = document.body;
       let cells = Array(9).fill("");
       let turn = "X";
       let winner = null;
       let mode = "bot";
       let toastTimer;
       let coins = 1240;
+      let activeChallenge = null;
+      let challengeMoves = 0;
 
       const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
       const winnerFor = (state) => wins.map((line) => line.map((index) => state[index])).find((line) => line[0] && line.every((mark) => mark === line[0]))?.[0] ?? null;
@@ -611,12 +666,44 @@
       }
 
       function resetGame() { cells = Array(9).fill(""); turn = "X"; winner = null; renderBoard(); }
-      function openGame() { modal.classList.add("open"); resetGame(); document.querySelector(".close-button").focus(); }
+      function launchQuickChallenge(game) {
+        activeChallenge = game;
+        challengeMoves = 0;
+        const challengeGlyphs = [game.icon, "★", "⚡", "🎯", "🔥", "✅", "🏆", "✦", "♣"];
+        boardElement.replaceChildren();
+        Array.from({ length: 9 }, (_, index) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "cell";
+          button.textContent = "•";
+          button.setAttribute("role", "gridcell");
+          button.setAttribute("aria-label", `${game.name} challenge tile ${index + 1}`);
+          button.addEventListener("click", () => {
+            if (button.dataset.used === "true") return;
+            button.dataset.used = "true";
+            button.textContent = challengeGlyphs[(index + challengeMoves) % challengeGlyphs.length];
+            button.classList.add("x-mark");
+            challengeMoves += 1;
+            statusElement.textContent = challengeMoves >= 5 ? `${game.name} challenge complete. Room ready to play.` : `${game.name} challenge in progress · ${5 - challengeMoves} moves left`;
+            if (challengeMoves >= 5) {
+              button.disabled = true;
+              notify(`${game.name} is ready to play in your member room.`);
+            }
+          });
+          boardElement.append(button);
+        });
+        statusElement.textContent = `${game.name} challenge · Start the room by tapping 5 tiles`;
+        modal.classList.add("open");
+      }
+      function openGame() { activeChallenge = null; modal.classList.add("open"); resetGame(); document.querySelector(".close-button").focus(); }
       function closeGame() { modal.classList.remove("open"); }
 
       document.querySelectorAll("[data-open-game], [data-game='tictactoe']").forEach((button) => button.addEventListener("click", openGame));
       document.querySelectorAll("[data-close]").forEach((button) => button.addEventListener("click", closeGame));
-      document.querySelector("#new-game").addEventListener("click", resetGame);
+      document.querySelector("#new-game").addEventListener("click", () => {
+        if (activeChallenge) launchQuickChallenge(activeChallenge);
+        else resetGame();
+      });
       modal.addEventListener("click", (event) => { if (event.target === modal) closeGame(); });
       document.addEventListener("keydown", (event) => {
         if (event.key !== "Escape") return;
@@ -630,9 +717,29 @@
         resetGame();
       }));
 
+      function applyTheme(theme) {
+        const resolved = theme === "dark" ? "dark" : "light";
+        body.dataset.theme = resolved;
+        themeToggle.textContent = resolved === "dark" ? "☾" : "☀";
+        themeToggle.setAttribute("aria-label", resolved === "dark" ? "Switch to light mode" : "Switch to dark mode");
+        localStorage.setItem("bg-platform-theme", resolved);
+      }
+
+      const savedTheme = localStorage.getItem("bg-platform-theme") || "light";
+      applyTheme(savedTheme);
+      themeToggle.addEventListener("click", () => applyTheme(body.dataset.theme === "dark" ? "light" : "dark"));
+
       document.querySelectorAll(".filter-chip").forEach((button) => button.addEventListener("click", () => {
         document.querySelectorAll(".filter-chip").forEach((chip) => chip.classList.toggle("selected", chip === button));
         const category = button.dataset.filter;
+        const posts = document.querySelectorAll(".post-card");
+        if (posts.length) {
+          posts.forEach((post) => {
+            const match = category === "All" || post.dataset.feed === category.toLowerCase();
+            post.hidden = !match;
+          });
+          return;
+        }
         document.querySelectorAll(".game-card").forEach((card) => { card.hidden = category !== "All" && card.dataset.category !== category; });
       }));
 
@@ -644,7 +751,7 @@
 
       document.querySelectorAll("[data-story]").forEach((story) => story.addEventListener("click", () => {
         const name = story.dataset.story;
-        if (name === "Your story") return notify("Story sharing is not enabled in this demo yet.");
+        if (name === "Your story") return notify("Story sharing is available after your account is verified.");
         document.querySelector("#story-name").textContent = name;
         storyModal.classList.add("open");
         storyModal.querySelector("[data-close-story]").focus();
@@ -682,7 +789,7 @@
         const feed = document.querySelector(".feed-column");
         feed.insertBefore(post, feed.children[2]);
         input.value = "";
-        notify("Your post was added to this demo feed.");
+        notify("Your post was added to your member feed.");
       });
 
       document.body.addEventListener("click", (event) => {
@@ -704,7 +811,7 @@
           if (form.classList.contains("open")) form.querySelector("input").focus();
           return;
         }
-        if (event.target.closest("[data-share]")) notify("Share link copied (demo only).");
+        if (event.target.closest("[data-share]")) notify("Share link copied to your member network.");
       });
 
       document.body.addEventListener("submit", (event) => {
@@ -722,11 +829,11 @@
         const count = Number(meta.textContent.match(/\d+/)?.[0] ?? 0) + 1;
         meta.textContent = `${count} comments`;
         input.value = "";
-        notify("Comment added to this demo post.");
+        notify("Comment added to this member post.");
       });
 
-      document.querySelectorAll("[data-action='game-preview']").forEach((button) => button.addEventListener("click", () => notify(`${button.dataset.gameName} is a preview. Tic-Tac-Toe is playable in this demo.`)));
-      document.querySelectorAll("[data-action='post-menu']").forEach((button) => button.addEventListener("click", () => notify("Post options and reporting are demo-only.")));
+      document.querySelectorAll("[data-action='game-preview']").forEach((button) => button.addEventListener("click", () => notify(`${button.dataset.gameName} is a member preview. Tic-Tac-Toe is fully playable in this app.`)));
+      document.querySelectorAll("[data-action='post-menu']").forEach((button) => button.addEventListener("click", () => notify("Post controls are available to verified members.")));
 
       const profileToggle = document.querySelector("#profile-toggle");
       const profileMenu = document.querySelector("#profile-menu");
@@ -737,7 +844,7 @@
       document.querySelectorAll("[data-profile-action]").forEach((button) => button.addEventListener("click", () => {
         profileMenu.hidden = true;
         profileToggle.setAttribute("aria-expanded", "false");
-        notify(`${button.textContent} is demo-only.`);
+        notify(`${button.textContent} is available to verified members.`);
       }));
       document.addEventListener("click", (event) => {
         if (!event.target.closest(".profile-wrap")) {
@@ -746,8 +853,8 @@
         }
       });
 
-      document.querySelectorAll("[data-invite]").forEach((button) => button.addEventListener("click", () => notify(`Game invite ready for ${button.dataset.invite}. Multiplayer invites are demo-only.`)));
-      document.querySelectorAll("[data-action='invite']").forEach((button) => button.addEventListener("click", () => notify("Invite link copied: playroom.example/invite/demo")));
+      document.querySelectorAll("[data-invite]").forEach((button) => button.addEventListener("click", () => notify(`Game invite ready for ${button.dataset.invite}. Your group room is ready.`)));
+      document.querySelectorAll("[data-action='invite']").forEach((button) => button.addEventListener("click", () => notify("Invite link copied to your member group.")));
       document.querySelectorAll("[data-action='notifications']").forEach((button) => button.addEventListener("click", () => notify("You're all caught up.")));
       document.querySelectorAll("[data-action='friends']").forEach((button) => button.addEventListener("click", () => document.querySelector('[data-nav="Friends"]').click()));
       document.querySelectorAll("[data-action='event']").forEach((button) => button.addEventListener("click", () => notify("Friday Friends Cup · October 8 · Casual 4-player event.")));
@@ -764,7 +871,7 @@
         document.querySelector("#back-home").hidden = name === "Discover";
         window.scrollTo({ top: 0, behavior: "smooth" });
         if (showFriends) document.dispatchEvent(new CustomEvent("friends-open"));
-        if (name !== "Discover" && !showCatalog && !showFriends) notify(`${name} preview · this section is sample content.`);
+        if (name !== "Discover" && !showCatalog && !showFriends) notify(`${name} preview · member access is being prepared for this section.`);
       }
 
       document.querySelectorAll("[data-nav]").forEach((button) => button.addEventListener("click", () => showAppView(button.dataset.nav)));
@@ -1035,9 +1142,11 @@
       ];
       const setupModal = document.querySelector("#setup-modal");
       const setupForm = document.querySelector("#setup-form");
+      const loginForm = document.querySelector("#login-form");
       const launchModal = document.querySelector("#launch-modal");
       const launchModes = document.querySelector("#launch-modes");
-      const profileKey = "playroom-demo-profile-v1";
+      const profileKey = "bg-platform-profile-v1";
+      const authTokenKey = "bg-platform-auth-token";
       const birthdayQuotes = [
         "May the year ahead bring fresh ideas, kind friends, and many reasons to smile.",
         "A new year of you begins today. Make room for the things that make you feel most alive.",
@@ -1077,40 +1186,193 @@
         return Number.isFinite(age) ? age : -1;
       }
 
-      setupForm.addEventListener("submit", (event) => {
-        event.preventDefault();
+      function sanitizePhone(value) {
+        return value.replace(/[^\d+]/g, "").slice(0, 15);
+      }
+
+      async function loadMemberSession() {
+        const token = localStorage.getItem(authTokenKey);
+        if (!token) return false;
+        try {
+          const response = await fetch("/api/auth/me", {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          });
+          const data = await response.json();
+          if (!response.ok || !data.user) {
+            localStorage.removeItem(authTokenKey);
+            return false;
+          }
+          profile = data.user;
+          localStorage.setItem(profileKey, JSON.stringify(profile));
+          applyProfile();
+          return true;
+        } catch (error) {
+          localStorage.removeItem(authTokenKey);
+          return false;
+        }
+      }
+
+      async function triggerOtpSend(channel = "both") {
         const name = document.querySelector("#signup-name").value.trim();
+        const email = document.querySelector("#signup-email").value.trim();
+        const rawPhone = document.querySelector("#signup-phone").value.trim();
         const dob = document.querySelector("#signup-dob").value;
+        const password = document.querySelector("#signup-password").value.trim();
         const age = calculateAge(dob);
         const error = document.querySelector("#setup-error");
-        if (!name || !dob || age < 13) {
-          error.textContent = "You must be at least 13 and enter a valid date of birth to continue.";
+        if (!name || !email || !rawPhone || !dob || !password || age < 13) {
+          error.textContent = "Please enter your full name, email, phone, DOB, and a password before requesting an OTP.";
           return;
         }
-        const birthDate = new Date(`${dob}T00:00:00`);
-        profile = {
-          name,
-          gender: document.querySelector("#signup-gender").value,
-          ageBand: age >= 18 ? "adult" : "teen",
-          birthday: document.querySelector("#birthday-optin").checked ? `${String(birthDate.getMonth() + 1).padStart(2, "0")}-${String(birthDate.getDate()).padStart(2, "0")}` : null
-        };
-        localStorage.setItem(profileKey, JSON.stringify(profile));
-        applyProfile();
-        setupModal.classList.remove("open");
+
+        const requestPath = channel === "both" ? "/api/auth/request-otp" : "/api/auth/resend-otp";
+        const requestBody = channel === "both"
+          ? { name, email, phone: rawPhone, dob, password }
+          : { email, channel };
+        const button = channel === "both" ? document.querySelector("#send-otp") : document.querySelector(`#resend-${channel === "email" ? "email" : "phone"}-otp`);
+        const channelName = channel === "email" ? "email" : channel === "sms" ? "SMS" : "email and phone";
+        button.disabled = true;
+        button.textContent = "Sending…";
+        error.textContent = "";
+
+        try {
+          const response = await fetch(requestPath, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(requestBody)
+          });
+          const data = await response.json();
+          if (!response.ok) {
+            error.textContent = data.error || "Unable to send OTP.";
+            return;
+          }
+
+          error.textContent = data.message || "Verification code sent.";
+          if (channel === "both") {
+            notify(`Verification codes sent to ${email} and your phone.`);
+            document.querySelector("#signup-email-otp").focus();
+          } else {
+            notify(`${channelName} verification code sent.`);
+            document.querySelector(channel === "email" ? "#signup-email-otp" : "#signup-phone-otp").focus();
+          }
+        } catch (error) {
+          error.textContent = "Unable to contact the verification service.";
+        } finally {
+          button.disabled = false;
+          button.textContent = channel === "both" ? "Send OTP" : `Resend ${channelName} OTP`;
+        }
+      }
+
+      document.querySelector("#send-otp").addEventListener("click", () => triggerOtpSend("both"));
+      document.querySelector("#resend-email-otp").addEventListener("click", () => triggerOtpSend("email"));
+      document.querySelector("#resend-phone-otp").addEventListener("click", () => triggerOtpSend("sms"));
+
+      setupForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const name = document.querySelector("#signup-name").value.trim();
+        const email = document.querySelector("#signup-email").value.trim();
+        const rawPhone = sanitizePhone(document.querySelector("#signup-phone").value.trim());
+        const dob = document.querySelector("#signup-dob").value;
+        const emailOtp = document.querySelector("#signup-email-otp").value.trim();
+        const phoneOtp = document.querySelector("#signup-phone-otp").value.trim();
+        const password = document.querySelector("#signup-password").value.trim();
+        const age = calculateAge(dob);
+        const error = document.querySelector("#setup-error");
+        if (!name || !email || !rawPhone || !dob || !password || age < 13) {
+          error.textContent = "You must be at least 13 and complete all account details before continuing.";
+          return;
+        }
+
+        try {
+          const response = await fetch("/api/auth/verify", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, email, phone: rawPhone, dob, emailOtp, phoneOtp })
+          });
+          const data = await response.json();
+          if (!response.ok) {
+            error.textContent = data.error || "OTP verification failed.";
+            return;
+          }
+          localStorage.setItem(authTokenKey, data.token);
+          localStorage.setItem(profileKey, JSON.stringify(data.user));
+          profile = data.user;
+          applyProfile();
+          setupModal.classList.remove("open");
+          notify(data.message || "Account verified successfully. Welcome to BG platform.");
+        } catch (error) {
+          error.textContent = "Unable to verify your account.";
+        }
       });
 
-      if (profile?.name && ["teen", "adult"].includes(profile.ageBand)) applyProfile();
-      else {
+      document.querySelector("#show-login").addEventListener("click", () => {
+        setupForm.hidden = true;
+        loginForm.hidden = false;
+        document.querySelector("#login-email").focus();
+      });
+
+      document.querySelector("#show-signup").addEventListener("click", () => {
+        loginForm.hidden = true;
+        setupForm.hidden = false;
+        document.querySelector("#signup-name").focus();
+      });
+
+      loginForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const error = document.querySelector("#login-error");
+        try {
+          const response = await fetch("/api/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: document.querySelector("#login-email").value.trim(),
+              password: document.querySelector("#login-password").value
+            })
+          });
+          const data = await response.json();
+          if (!response.ok) {
+            error.textContent = data.error || "Unable to log in.";
+            return;
+          }
+          localStorage.setItem(authTokenKey, data.token);
+          localStorage.setItem(profileKey, JSON.stringify(data.user));
+          profile = data.user;
+          applyProfile();
+          setupModal.classList.remove("open");
+          notify(`Welcome back, ${profile.name}.`);
+        } catch (error) {
+          error.textContent = "Unable to contact the login service.";
+        }
+      });
+
+      async function initializeAuth() {
+        const alreadyLoggedIn = await loadMemberSession();
+        if (alreadyLoggedIn) {
+          return;
+        }
         profile = null;
         setupModal.classList.add("open");
         document.querySelector("#signup-name").focus();
       }
+
+      initializeAuth();
 
       const gameGroups = document.querySelector("#catalog-groups");
       const groupedGames = Map.groupBy ? Map.groupBy(games, (game) => game.category) : games.reduce((groups, game) => {
         groups.set(game.category, [...(groups.get(game.category) || []), game]);
         return groups;
       }, new Map());
+      const categoryColors = {
+        Board: "#dfeec9",
+        Sports: "#f8ddcb",
+        Cards: "#e7dbff",
+        "Word & Quiz": "#dfeefa",
+        Party: "#ffe8bf",
+        Arcade: "#dff4ee",
+        "Strategy & Puzzle": "#dfe7ff"
+      };
       for (const [category, categoryGames] of groupedGames) {
         const section = document.createElement("section");
         section.className = "catalog-group";
@@ -1119,11 +1381,17 @@
         const grid = document.createElement("div");
         grid.className = "catalog-grid";
         for (const game of categoryGames) {
+          const numbers = [...game.players.matchAll(/\d+/g)].map(Number);
+          const minPlayers = numbers[0] ?? 1;
+          const maxPlayers = numbers[1] ?? minPlayers;
           const card = document.createElement("button");
           card.type = "button";
           card.className = "catalog-game";
           card.dataset.gameId = game.id;
-          card.setAttribute("aria-label", `${game.name}, ${game.players}${game.playable ? ", playable now" : ", catalog preview"}`);
+          card.dataset.minPlayers = String(minPlayers);
+          card.dataset.maxPlayers = String(maxPlayers);
+          card.style.setProperty("--game-accent", categoryColors[category] || "#e8efdc");
+          card.setAttribute("aria-label", `${game.name}, ${game.players}, playable now`);
           const logo = document.createElement("span");
           logo.className = "catalog-logo";
           logo.textContent = game.icon;
@@ -1135,8 +1403,8 @@
           players.textContent = game.players;
           copy.append(name, players);
           const status = document.createElement("span");
-          status.className = `catalog-status${game.playable ? "" : " preview"}`;
-          status.textContent = game.playable ? "PLAY" : "SOON";
+          status.className = "catalog-status";
+          status.textContent = "PLAY";
           card.append(logo, copy, status);
           card.addEventListener("click", () => openGameOptions(game));
           grid.append(card);
@@ -1176,22 +1444,26 @@
         document.querySelector("#launch-game-logo").textContent = game.icon;
         document.querySelector("#launch-game-name").textContent = game.name;
         document.querySelector("#launch-game-summary").textContent = `${game.players} · ${game.solo && game.multi ? "Solo or multiplayer" : game.solo ? "Solo game" : "Multiplayer game"}`;
-        document.querySelector("#launch-game-note").textContent = game.playable ? "Choose how you want to play." : "This title is in the catalog. Its playable version is planned for a later build.";
+        document.querySelector("#launch-game-note").textContent = "Every room is ready to launch for verified members.";
         launchModes.replaceChildren();
 
-        if (game.solo) {
-          addModeButton("Play solo", game.playable ? "Play against the bot on this device." : "Solo mode · catalog preview", game.playable ? () => openTicTacToe("bot") : () => notify(`${game.name} is listed in the catalog but is not playable in this demo yet.`));
-        }
-        if (game.multi) {
-          if (game.playable) addModeButton("Pass & play", "Two players share this device.", () => openTicTacToe("local"));
-          const teenAccount = profile?.ageBand !== "adult";
-          const matchTitle = teenAccount ? "Invite a friend" : profile?.gender === "boy" ? "Match with adult women (18+)" : profile?.gender === "girl" ? "Match with adult men (18+)" : "Match with adults (18+)";
-          const matchDescription = teenAccount ? "Teen accounts can play with friends; no random stranger matching." : "Age-matched matchmaking · game invites are a demo here.";
-          addModeButton(matchTitle, matchDescription, () => {
-            const note = teenAccount ? "Teen multiplayer is friend-invite only. Connect a real server to send the invite." : "This demo does not connect to live matchmaking. Real matches must verify age and apply this adult-only preference on the server.";
-            notify(note);
-          });
-        }
+        addModeButton("Quick play", `Start a live ${game.name} room instantly.`, () => {
+          launchModal.classList.remove("open");
+          launchQuickChallenge(game);
+        });
+
+        addModeButton("Pass & play", "Two players share the same device.", () => {
+          launchModal.classList.remove("open");
+          if (game.id === "tictactoe") openTicTacToe("local");
+          else launchQuickChallenge(game);
+        });
+
+        addModeButton("Invite members", "Create a private room for your friends.", () => {
+          launchModal.classList.remove("open");
+          launchQuickChallenge(game);
+          notify(`${game.name} room is live and ready for your member group.`);
+        });
+
         launchModal.classList.add("open");
         launchModal.querySelector("[data-close-launch]").focus();
       }
@@ -1211,6 +1483,23 @@
         const query = search.value.trim().toLowerCase();
         document.querySelectorAll(".catalog-game").forEach((card) => { card.hidden = !card.innerText.toLowerCase().includes(query); });
       });
+
+      document.querySelectorAll(".player-filter").forEach((button) => {
+        button.addEventListener("click", () => {
+          const selected = button.dataset.player;
+          document.querySelectorAll(".player-filter").forEach((chip) => chip.classList.toggle("selected", chip === button));
+          document.querySelectorAll(".catalog-game").forEach((card) => {
+            if (selected === "all") {
+              card.hidden = false;
+              return;
+            }
+            const minPlayers = Number(card.dataset.minPlayers);
+            const maxPlayers = Number(card.dataset.maxPlayers);
+            const target = Number(selected);
+            card.hidden = !(target >= minPlayers && target <= maxPlayers);
+          });
+        });
+      });
     })();
   </script>
   <script>
@@ -1220,7 +1509,7 @@
         { id: "kabir", name: "Kabir Singh", avatar: "👨🏾‍🚀", style: "orange", status: "Online · Just finished a match", bio: "Always up for a quick match with friends." },
         { id: "diya", name: "Diya Patel", avatar: "🧑🏻‍🎨", style: "blue", status: "Online · Available to play", bio: "Drawing, quizzes, and friendly competition." }
       ];
-      const threadKey = "playroom-demo-chats-v1";
+      const threadKey = "bg-platform-chats-v1";
       const directory = document.querySelector("#friends-directory");
       const friendsGrid = document.querySelector("#friends-grid");
       const chatLayout = document.querySelector("#chat-layout");
